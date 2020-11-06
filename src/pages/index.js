@@ -31,8 +31,8 @@ const popupContentGatsby = `
       <img class="gatsby-astronaut" src=${gatsby_astronaut} />
     </div>
     <div class="popup-gatsby-content">
-      <h1>Gatsby Leaflet Starter</h1>
-      <p>Welcome to your new Gatsby site. Now go build something great!</p>
+      <h1>Innovative Geography</h1>
+      <p>Search below to find areas of research and show them on the map.</p>
     </div>
   </div>
 `;
@@ -94,10 +94,8 @@ const IndexPage = () => {
       </Map>
 
       <Container type="content" className="text-center home-start">
-        <h2>Still Getting Started?</h2>
-        <p>Run the following in your terminal!</p>
-        <Snippet>gatsby new [directory] https://github.com/colbyfayock/gatsby-starter-leaflet</Snippet>
-        <p className="note">Note: Gatsby CLI required globally for the above command</p>
+        <h2>Search</h2>
+        <input />
       </Container>
     </Layout>
   );
