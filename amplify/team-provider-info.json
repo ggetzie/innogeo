@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-innogeo-dev-82530-authRole",
+      "UnauthRoleArn": "arn:aws:iam::661004473460:role/amplify-innogeo-dev-82530-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::661004473460:role/amplify-innogeo-dev-82530-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-innogeo-dev-82530-deployment",
+      "UnauthRoleName": "amplify-innogeo-dev-82530-unauthRole",
+      "StackName": "amplify-innogeo-dev-82530",
+      "StackId": "arn:aws:cloudformation:us-east-1:661004473460:stack/amplify-innogeo-dev-82530/972e1f20-1fc6-11eb-901b-0ac2c503da11",
+      "AmplifyAppId": "di91yewf36x1"
+    }
+  }
+}
