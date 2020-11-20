@@ -8,6 +8,7 @@ import { promiseToFlyTo, getCurrentLocation } from 'lib/map';
 import Layout from 'components/Layout';
 import Container from 'components/Container';
 import Map from 'components/Map';
+import SearchForm from 'components/SearchForm';
 // import Snippet from 'components/Snippet';
 
 import gatsby_astronaut from 'assets/images/gatsby-astronaut.jpg';
@@ -94,9 +95,7 @@ const IndexPage = () => {
       </Map>
 
       <Container type="content" className="text-center home-start">
-        <h2>Search</h2>
-        <input />
-        <button>Search</button>
+        <SearchForm />
       </Container>
     </Layout>
   );
