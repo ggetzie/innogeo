@@ -14,7 +14,7 @@
     "axios": "^0.21.0",
     "core-js": "^3.0.0",
     "gatsby": "^2.24.67",
-    "gatsby-cli": "^2.12.117",
+    "gatsby-cli": "^2.14.0",
     "gatsby-plugin-manifest": "^2.4.34",
     "gatsby-plugin-react-helmet": "^3.3.11",
     "gatsby-plugin-react-leaflet": "2.0.13",
@@ -32,7 +32,8 @@
     "react-icons": "^3.11.0",
     "react-leaflet": "^2.8.0",
     "react-redux": "^7.2.2",
-    "redux": "^4.0.5"
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",

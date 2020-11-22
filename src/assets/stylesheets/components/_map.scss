@@ -1,6 +1,7 @@
 .map {
 
-  position: relative;
+  position: sticky;
+  top: 0;
 
   &,
   .map-base {

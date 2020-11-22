@@ -22,3 +22,26 @@ body {
 main {
   padding: 2em 0;
 }
+
+.paper-title {
+  text-transform: capitalize;
+}
+
+.search-result {
+  text-align: left;
+  margin-bottom: 3em;
+}
+
+.search-result ul {
+  margin-top: 0;
+  list-style: none;
+}
+
+.search-result h3, h4 {
+  margin-bottom: 0;
+}
+
+.fos-list li {
+  display: inline;
+  padding-right: 1.5em;
+}

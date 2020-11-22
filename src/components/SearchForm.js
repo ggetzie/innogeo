@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import { connect } from 'react-redux';
+import { fetchResults } from '../actions/resultActions';
+import PropTypes from 'prop-types';
 
 // const HKLongLat = [114.160486, 22.283262]
 
@@ -18,11 +20,11 @@ class SearchForm extends Component {
   handleSubmit( event ) {
     event.preventDefault();
     console.log( `Searching for ${this.state.terms}` );
-    axios
-      .get( 'https://1z85a4how2.execute-api.us-east-1.amazonaws.com/search_es', { params: { q: this.state.terms } })
-      .then(( res ) => {
-        console.log( res.data );
-      });
+    const query = {
+      q: this.state.terms
+    };
+    this.props.fetchResults(query)
+
   }
 
   render() {
@@ -31,11 +33,15 @@ class SearchForm extends Component {
         <h2>Search</h2>
         <form onSubmit={this.handleSubmit}>
           <input type="text" value={this.state.terms} onChange={this.handleChange} name="terms" />
-          <input type="submit" value="Search" />
+          <input type="submit" value="Submit" />
         </form>
       </div>
     );
   }
 }
 
-export default SearchForm;
+SearchForm.propTypes = {
+  fetchResults: PropTypes.func.isRequired
+}
+
+export default connect(null, {fetchResults})(SearchForm);

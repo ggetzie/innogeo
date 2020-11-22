@@ -9,6 +9,9 @@ import Layout from 'components/Layout';
 import Container from 'components/Container';
 import Map from 'components/Map';
 import SearchForm from 'components/SearchForm';
+import SearchResults from 'components/SearchResults';
+import { Provider } from 'react-redux';
+import store from "../store"
 // import Snippet from 'components/Snippet';
 
 import gatsby_astronaut from 'assets/images/gatsby-astronaut.jpg';
@@ -85,19 +88,22 @@ const IndexPage = () => {
   };
 
   return (
-    <Layout pageName="home">
-      <Helmet>
-        <title>Home Page</title>
-      </Helmet>
+    <Provider store={store}>
+      <Layout pageName="home">
+        <Helmet>
+          <title>Home Page</title>
+        </Helmet>
 
-      <Map ref={mapRef} {...mapSettings}>
-        <Marker ref={markerRef} position={CENTER} />
-      </Map>
+        <Map ref={mapRef} {...mapSettings}>
+          <Marker ref={markerRef} position={CENTER} />
+        </Map>
 
-      <Container type="content" className="text-center home-start">
-        <SearchForm />
-      </Container>
-    </Layout>
+        <Container type="content" className="text-center home-start">
+          <SearchForm />
+          <SearchResults />
+        </Container>
+      </Layout>
+    </Provider>
   );
 };
 
