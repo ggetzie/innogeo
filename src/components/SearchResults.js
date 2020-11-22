@@ -14,7 +14,7 @@ function AuthorItem(props) {
       )
 }
 
-AuthorItem.PropTypes = {
+AuthorItem.propTypes = {
   author: PropTypes.object.isRequired
 }
 
@@ -40,14 +40,14 @@ function PaperResult(props) {
   )
 }
 
-PaperResult.PropTypes = {
+PaperResult.propTypes = {
   hit: PropTypes.object.isRequired
 }
 
 class SearchResults extends Component {
     
   render() {
-    let resultHits = this.props.papers.map((hit) => <PaperResult hit={hit} />);
+    let resultHits = this.props.papers.map((hit) => <PaperResult key={hit._id} hit={hit} />);
 
     return (
       <div>
@@ -62,8 +62,10 @@ class SearchResults extends Component {
   }
 }
 function mapStateToProps(state) {
+  console.log("mapping state")
+  console.log(state)
   const res = {
-    papers: state.papers.papers
+    papers: state.results.papers
   }
   return res;
 }
