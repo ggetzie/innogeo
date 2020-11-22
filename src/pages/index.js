@@ -20,7 +20,10 @@ const LOCATION = {
   lat: 38.9072,
   lng: -77.0369,
 };
-const CENTER = [LOCATION.lat, LOCATION.lng];
+
+const HongKong = [22.283262, 114.160486];
+// const CENTER = [LOCATION.lat, LOCATION.lng];
+const CENTER = [0,0]
 const DEFAULT_ZOOM = 2;
 const ZOOM = 10;
 
@@ -79,6 +82,7 @@ const IndexPage = () => {
       setTimeout(() => marker.setPopupContent( popupContentGatsby ), timeToUpdatePopupAfterZoom );
     }, timeToZoom );
   }
+  
 
   const mapSettings = {
     center: CENTER,
@@ -95,7 +99,7 @@ const IndexPage = () => {
         </Helmet>
 
         <Map ref={mapRef} {...mapSettings}>
-          <Marker ref={markerRef} position={CENTER} />
+          {/* <Marker ref={markerRef} position={CENTER} /> */}
         </Map>
 
         <Container type="content" className="text-center home-start">

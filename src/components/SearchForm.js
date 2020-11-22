@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { fetchResults } from '../actions/resultActions';
 import PropTypes from 'prop-types';
 
-// const HKLongLat = [114.160486, 22.283262]
+
 
 class SearchForm extends Component {
   constructor( props ) {
