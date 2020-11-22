@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Map as BaseMap, TileLayer, ZoomControl, Marker, Popup } from 'react-leaflet';
+import { Map as BaseMap, TileLayer, ZoomControl, Marker, Popup, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import { useConfigureLeaflet, useMapServices, useRefEffect } from 'hooks';
@@ -30,6 +30,7 @@ const DEFAULT_MAP_SERVICE = 'OpenStreetMap';
 function getAffiliations(papers) {
   let affIdSet = new Set();
   let affiliation_list = []
+  let collaboration_list = []
   for (let paper of papers) {
     for (let author of paper._source.authors) {
         if (author.affiliation && !(affIdSet.has(author.affiliation.affiliation_id))) {
@@ -68,8 +69,6 @@ const Map = React.forwardRef(( props, ref ) => {
   console.log("affiliation set")
   console.log(affiliations)
 
-  
-
   const services = useMapServices({
     names: [...new Set([defaultBaseMap, DEFAULT_MAP_SERVICE])],
   });
@@ -103,10 +102,27 @@ const Map = React.forwardRef(( props, ref ) => {
     </Marker>
   ))
 
+  // const linePositions = papers
+  //                       .filter((paper) => paper._source.locations.length > 1)
+  //                       .map((paper) => paper._source.locations)
+  // console.log("Line positions")                        
+  // console.log(linePositions)                        
+
+  const collaborationLines = papers
+  .filter((paper) => (paper._source.locations.length > 1))
+  .map((paper) => (
+    <Polyline 
+    key={paper._source.paper_id} 
+    positions={paper._source.locations.map((l) => l.reverse())}
+    color="magenta">
+    </Polyline>
+  ))
+
   return (
     <div className={mapClassName}>
       <BaseMap ref={mapRef} {...mapSettings}>
         {affiliationMarkers}
+        {collaborationLines}
         { children }
         { basemap && <TileLayer {...basemap} /> }
         <ZoomControl position="bottomright" />
