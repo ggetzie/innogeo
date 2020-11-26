@@ -29,7 +29,7 @@ class SearchForm extends Component {
 
   render() {
     return (
-      <div>
+      <div className="search-form">
         <h2>Search</h2>
         <form onSubmit={this.handleSubmit}>
           <input type="text" value={this.state.terms} onChange={this.handleChange} name="terms" />
