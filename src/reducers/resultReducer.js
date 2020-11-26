@@ -1,7 +1,8 @@
-import { FETCH_RESULTS } from "../actions/types";
+import { FETCH_RESULTS, SET_LOADING } from "../actions/types";
 
 const initialState = {
-    papers: []
+    papers: [],
+    loading: false
 }
 
 export default function(state=initialState, action) {
@@ -9,11 +10,17 @@ export default function(state=initialState, action) {
         case FETCH_RESULTS:
             const res = {
                 ...state,
-                papers: action.payload.data.hits.hits
+                papers: action.payload.data.hits.hits,
+                loading: false,
             }
             console.log("result reducer res")
             console.log(res)
             return res
+        case SET_LOADING:
+            return {
+                ...state,
+                loading: action.payload,
+            }
         default:
             return state;        
     }

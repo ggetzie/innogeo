@@ -48,17 +48,12 @@ function getAffiliations(papers) {
 }
 
 const Map = React.forwardRef(( props, ref ) => {
-  const { children, className, defaultBaseMap = DEFAULT_MAP_SERVICE, mapEffect, zoom, ...rest } = props;
+  const { children, className, defaultBaseMap = DEFAULT_MAP_SERVICE, ...rest } = props;
 
   useConfigureLeaflet();
 
   const backupRef = useRef();
   const mapRef = ref || backupRef;
-
-  // useRefEffect({
-  //   ref: mapRef,
-  //   effect: mapEffect,
-  // });
 
   // locate papers on the map
   const papers = useSelector((state) => state.results.papers)
@@ -91,7 +86,6 @@ const Map = React.forwardRef(( props, ref ) => {
   const mapSettings = {
     className: 'map-base',
     zoomControl: false,
-    zoom: papers.length > 0 ? 2 : zoom, // zoom all the way out if we have results
     ...rest,
   };
   const affiliationMarkers = affiliations.map((aff) => (
@@ -101,12 +95,6 @@ const Map = React.forwardRef(( props, ref ) => {
       </Popup>
     </Marker>
   ))
-
-  // const linePositions = papers
-  //                       .filter((paper) => paper._source.locations.length > 1)
-  //                       .map((paper) => paper._source.locations)
-  // console.log("Line positions")                        
-  // console.log(linePositions)                        
 
   const collaborationLines = papers
   .filter((paper) => (paper._source.locations.length > 1))
