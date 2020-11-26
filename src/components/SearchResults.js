@@ -20,18 +20,19 @@ AuthorItem.propTypes = {
 
 function PaperResult(props) {
   const fos = props.hit._source.fields_of_study.map((field) => (
-    <li key={field.field_of_study_id}>
+    <span key={field.field_of_study_id} className="fos-span">
       {field.fos_name}
-    </li>
+    </span>
   ))
   const authors = props.hit._source.authors.map((author) => (<AuthorItem key={author.author_id} author={author}/>))
   return (
     <div key={props.hit._source.paper_id} className="search-result">
       <h3>Title: <span className="paper-title">{props.hit._source.paper_title}</span></h3>
+      <p className="year">{props.hit._source.year}</p>
       <h4>Fields of Study</h4>
-      <ul className="fos-list">
-        {fos}
-      </ul>
+      <p className="fos-list">
+        {fos} 
+      </p>
       <h4>Authors</h4>
       <ul>
         {authors}

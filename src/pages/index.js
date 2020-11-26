@@ -97,15 +97,17 @@ const IndexPage = () => {
         <Helmet>
           <title>Home Page</title>
         </Helmet>
-
-        <Map ref={mapRef} {...mapSettings}>
-          {/* <Marker ref={markerRef} position={CENTER} /> */}
-        </Map>
-
-        <Container type="content" className="text-center home-start">
-          <SearchForm />
-          <SearchResults />
-        </Container>
+        <div className="main-row">
+          <div className="res-col">
+            <SearchForm />
+            <SearchResults />
+          </div>
+          <div className="map-col">
+            <Map ref={mapRef} {...mapSettings}>
+            </Map>
+          </div>
+          
+        </div>
       </Layout>
     </Provider>
   );

@@ -41,7 +41,17 @@ main {
   margin-bottom: 0;
 }
 
-.fos-list li {
-  display: inline;
+p.fos-list {
+  width: 100%;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+span.fos-span {
   padding-right: 1.5em;
+}
+
+p.year {
+  margin: 0;
+  font-weight: lighter;
 }

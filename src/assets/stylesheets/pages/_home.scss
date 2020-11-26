@@ -2,11 +2,30 @@
 
   .map,
   .map-base {
-    height: 50vh;
+    height: calc(-72px + 100vh);
   }
 
   main {
     padding: 0;
+  }
+
+  .main-row {
+    display: flex;
+    flex-direction: row;
+    height: calc(-72px + 100vh);
+  }
+
+  .map-col {
+    width: 60%;
+    height: 100%;
+  }
+  .res-col {
+    width:40%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-wrap: normal;
+    padding: 0 20px 0 20px;
+    
   }
 
   .popup-gatsby {
