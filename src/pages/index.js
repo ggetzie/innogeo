@@ -11,10 +11,10 @@ import store from "../store"
 
 import 'leaflet/dist/leaflet.css'
 
-const LOCATION = {
-  lat: 38.9072,
-  lng: -77.0369,
-};
+// const LOCATION = {
+//   lat: 38.9072,
+//   lng: -77.0369,
+// };
 const HongKong = [22.283262, 114.160486];
 // const CENTER = [LOCATION.lat, LOCATION.lng];
 // const CENTER = [0,0]
@@ -22,7 +22,6 @@ const CENTER = HongKong;
 const DEFAULT_ZOOM = 2;
 
 const IndexPage = () => {
-  const markerRef = useRef();
   const mapRef = useRef();
 
   /**

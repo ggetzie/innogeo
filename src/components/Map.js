@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Map as BaseMap, TileLayer, ZoomControl, Marker, Popup, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-import { useConfigureLeaflet, useMapServices, useRefEffect } from 'hooks';
+import { useConfigureLeaflet, useMapServices } from 'hooks';
 import { isDomAvailable } from 'lib/util';
 import { useSelector } from "react-redux";
 
@@ -30,7 +30,6 @@ const DEFAULT_MAP_SERVICE = 'OpenStreetMap';
 function getAffiliations(papers) {
   let affIdSet = new Set();
   let affiliation_list = []
-  let collaboration_list = []
   for (let paper of papers) {
     for (let author of paper._source.authors) {
         if (author.affiliation && !(affIdSet.has(author.affiliation.affiliation_id))) {

@@ -30,13 +30,14 @@ class SearchForm extends Component {
   }
 
   render() {
+    let content;
     if (this.props.loading) {
       content = <div className="spinner"></div>
     } else {
       content = (<form onSubmit={this.handleSubmit}>
-                  <input type="text" value={this.state.terms} onChange={this.handleChange} name="terms" />
-                  <input type="submit" value="Submit" />
-                </form>)
+                        <input type="text" value={this.state.terms} onChange={this.handleChange} name="terms" />
+                        <input type="submit" value="Submit" />
+                      </form>)
     }
     
     return (
