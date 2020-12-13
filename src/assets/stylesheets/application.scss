@@ -2,6 +2,7 @@
 @import "util/__util";
 @import "components/__components";
 @import "pages/__pages";
+@import "../../../node_modules/bootstrap/scss/bootstrap.scss";
 
 * {
   box-sizing: border-box;
@@ -69,4 +70,12 @@ p.year {
 @keyframes spin {
   0% {transform: rotate(0deg);}
   100% {transform: rotate(360deg);}
+}
+
+form label {
+  display: block;
+}
+
+form input {
+  display: block;
 }
