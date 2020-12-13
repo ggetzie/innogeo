@@ -8,14 +8,11 @@ const initialState = {
 export default function(state=initialState, action) {
     switch(action.type) {
         case FETCH_RESULTS:
-            const res = {
+            return {
                 ...state,
                 papers: action.payload.data.hits.hits,
                 loading: false,
-            }
-            console.log("result reducer res")
-            console.log(res)
-            return res
+            };
         case SET_LOADING:
             return {
                 ...state,
