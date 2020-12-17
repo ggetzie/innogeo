@@ -37,7 +37,10 @@ class SearchForm extends Component {
     console.log( `Searching for ${this.state.terms}` );
     this.props.setLoading();
     const query = {
-      q: this.state.terms
+      multi_match: {
+        query: this.state.terms,
+        fields: ["paper_title^2", "fos_name"]
+      }
     };
     this.props.fetchResults(query)
 
@@ -51,19 +54,28 @@ class SearchForm extends Component {
       content = (
       <form onSubmit={this.handleSubmit}>
         <div className="form-group">
-          <label for="terms">Keywords</label>
+          <label htmlFor="terms">Keywords</label>
           <input className="form-control" type="text" value={this.state.terms} onChange={this.handleChange} name="terms" />
         </div>
+        <div className="form-group">
+          <label htmlFor="author">Author</label>
+          <input className="form-control" type="text" value={this.state.author} onChange={this.handleChange} name="author" />
+        </div>
+        <p>Search for papers published between:</p>
         <div className="form-row">
           <div className="form-group col">
-            <label for="author">Author</label>
-            <input className="form-control" type="text" value={this.state.author} onChange={this.handleChange} name="author" />
+            <label htmlFor="minYear">Start Year</label>
+            <input className="form-control" type="number" value={this.state.minYear} onChange={this.handleChange} name="minYear" />
           </div>
           <div className="form-group col">
-            <label for="year">Year</label>
-            <input className="form-control" type="number" value={this.state.year} onChange={this.handleChange} name="year" />
+            <label htmlFor="maxYear">End Year</label>
+            <input className="form-control" type="number" value={this.state.maxYear} onChange={this.handleChange} name="maxYear" />
           </div>
         </div>
+        <div className="form-group">
+          <label htmlFor="city">City</label>
+          <input className="form-control" type="text" value={this.state.text} onChange={this.handleChange} name="city"/>
+        </div>        
         <div className="d-flex flex-row-reverse">
           <input className="btn btn-primary" type="submit" value="Submit" />
           <button className="btn btn-secondary mr-2" role="button" onClick={this.clearForm}>Clear</button>
