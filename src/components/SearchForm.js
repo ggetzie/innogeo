@@ -24,8 +24,6 @@ class SearchForm extends Component {
 
   clearForm( event ) {
     event.preventDefault();
-    console.log("clearing form")
-    console.log(this.state)
     for (let k in this.state) {
       console.log(k);
       this.setState({[k]: ""});
@@ -34,14 +32,44 @@ class SearchForm extends Component {
 
   handleSubmit( event ) {
     event.preventDefault();
-    console.log( `Searching for ${this.state.terms}` );
     this.props.setLoading();
+    let must_items = [];
+    let filter_items = [];
+    if (this.state.terms) {
+      must_items.push({
+        multi_match: {
+          query: this.state.terms,
+          fields: ["paper_title", "fields_of_study.fos_name"]
+        }
+      });
+    }
+    if (this.state.author) {
+      must_items.push({match: {"authors.author_name": this.state.author}});
+    }
+    if (this.state.minYear && this.state.maxYear) {
+      filter_items = [{range: {year: {gte: this.state.minYear, lte:this.state.maxYear}}}]
+    }
     const query = {
-      multi_match: {
-        query: this.state.terms,
-        fields: ["paper_title^2", "fos_name"]
+      bool: {
+        must: must_items,
+        filter: filter_items
       }
-    };
+    }
+    console.log("sending query");
+    console.log(query);
+    // const query = {
+    //   bool: {
+    //     must: [
+    //       { term: {"paper_title": this.state.terms}},
+    //       { term: {"fos_name": this.state.terms}},
+    //       { term: {"author_name": this.state.author}}
+    //     ],
+    //     filter: [
+    //       {range: {year: {gte: this.state.minYear, lte: this.state.maxYear}}}
+    //     ]
+    //   }
+    // };
+     
     this.props.fetchResults(query)
 
   }
