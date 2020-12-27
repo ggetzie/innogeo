@@ -48,16 +48,23 @@ PaperResult.propTypes = {
 class SearchResults extends Component {
     
   render() {
-    let resultHits = this.props.papers.map((hit) => <PaperResult key={hit._id} hit={hit} />);
+    let resultHits;
+    console.log(`searched = ${this.props.searched}`);
+    if (this.props.papers.length > 0) {
+      resultHits = this.props.papers.map((hit) => <PaperResult key={hit._id} hit={hit} />);
+    } else if (this.props.searched) {
+      resultHits = <p>No results found</p>
+    } else {
+      resultHits = <p>Enter query above and click "Submit" to search.</p>
+    }
+    
 
     return (
       <div>
-        {resultHits.length > 0 && 
           <React.Fragment>
             <h2>Papers</h2>
             {resultHits}
           </React.Fragment>
-        }
       </div>
     );
   }
@@ -66,13 +73,15 @@ function mapStateToProps(state) {
   console.log("mapping state")
   console.log(state)
   const res = {
-    papers: state.results.papers
+    papers: state.results.papers,
+    searched: state.results.searched
   }
   return res;
 }
 
 SearchResults.propTypes = {
-  papers: PropTypes.array.isRequired
+  papers: PropTypes.array.isRequired,
+  searched: PropTypes.bool
 }
 
 export default connect(mapStateToProps)(SearchResults);

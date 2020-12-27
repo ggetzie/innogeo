@@ -3,31 +3,130 @@ import { connect } from 'react-redux';
 import { fetchResults } from '../actions/resultActions';
 import { setLoading } from '../actions/loadingActions'
 import PropTypes from 'prop-types';
+import axios from 'axios';
+import { debounce } from "lodash";
 
+const ES_URL = 'https://1z85a4how2.execute-api.us-east-1.amazonaws.com/search_es'
+const DEBOUNCE_DELAY = 500;
 
+class CityList extends Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      cities: props.cities,
+      selected: -1,
+    }
+  }
+}
 
-class SearchForm extends Component {
-  constructor( props ) {
-    super( props );
-    this.state = { 
-      terms: '' ,
-      author: '',
-    };
-    this.handleChange = this.handleChange.bind( this );
-    this.handleSubmit = this.handleSubmit.bind( this );
-    this.clearForm = this.clearForm.bind( this );
+class CitySearch extends Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      value: "",
+      cities: [],
+      selected: {name: ""},
+      isLoading: false,
+      error: {
+        status: false,
+        message: ""
+      }
+    }
+    this.delayedCallback = debounce(this.fetchItems, DEBOUNCE_DELAY);
+    this.handleChange = this.handleChange.bind(this);
+    this.fetchItems = this.fetchItems.bind(this);
   }
 
-  handleChange( event ) {
-    this.setState({ [event.target.name]: event.target.value });
+  handleChange(event) {
+    this.setState({value: event.target.value})
+    if (event.target.value.length > 2) {
+      this.delayedCallback();
+    } else {
+      this.setState({cities: []})
+    }
+  }
+
+  fetchItems = async () => {
+    const value = this.state.value;
+    const { onChange } = this.props;
+    this.setState({isLoading: true});
+
+    try {
+      const data = {
+        size: 10,
+        query: {
+          multi_match: {
+            query: value,
+            type: "bool_prefix",
+            fields: [
+              "name",
+              "name._2gram",
+              "name._3gram"
+            ]
+          }
+        },
+        sort: [{population: "desc"}]
+      }
+      const res = await axios.post(ES_URL, data);
+      console.log("search cities")
+      console.log(res)
+      this.setState({cities: res.data.hits.hits});
+    } catch (error) {
+      this.setState({
+        error: {
+          status: true,
+          message: error
+        }
+      });
+    } finally {
+      this.setState({isLoading: false})
+    }
+  } 
+
+  render () {
+    let cityOptions = this.state.cities.map(city => (
+      <div key={city._id} className="ac_option">{city._source.name}, {city._source.admin1}, {city._source.country}</div>
+    ))
+    return (
+      <div className="form-group">
+        <label htmlFor="city">City</label>
+        <input type="text" className="form-control" value={this.state.value} onChange={this.handleChange} name="city" />
+        <div className="ac_container">
+          {cityOptions}
+        </div>
+      </div>
+    )
+
+  }
+}
+
+class SearchForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { 
+      terms: "",
+      author: "",
+      minYear: "",
+      maxYear: "",
+      cities: [],
+    };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.clearForm = this.clearForm.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({[event.target.name]: event.target.value});
   }
 
   clearForm( event ) {
     event.preventDefault();
-    for (let k in this.state) {
-      console.log(k);
-      this.setState({[k]: ""});
-    }
+    this.setState({
+      terms: "",
+      author: "",
+      minYear: "",
+      maxYear: "",
+    })
   }
 
   handleSubmit( event ) {
@@ -55,23 +154,7 @@ class SearchForm extends Component {
         filter: filter_items
       }
     }
-    console.log("sending query");
-    console.log(query);
-    // const query = {
-    //   bool: {
-    //     must: [
-    //       { term: {"paper_title": this.state.terms}},
-    //       { term: {"fos_name": this.state.terms}},
-    //       { term: {"author_name": this.state.author}}
-    //     ],
-    //     filter: [
-    //       {range: {year: {gte: this.state.minYear, lte: this.state.maxYear}}}
-    //     ]
-    //   }
-    // };
-     
     this.props.fetchResults(query)
-
   }
 
   render() {
@@ -100,10 +183,7 @@ class SearchForm extends Component {
             <input className="form-control" type="number" value={this.state.maxYear} onChange={this.handleChange} name="maxYear" />
           </div>
         </div>
-        <div className="form-group">
-          <label htmlFor="city">City</label>
-          <input className="form-control" type="text" value={this.state.text} onChange={this.handleChange} name="city"/>
-        </div>        
+        <CitySearch />
         <div className="d-flex flex-row-reverse">
           <input className="btn btn-primary" type="submit" value="Submit" />
           <button className="btn btn-secondary mr-2" role="button" onClick={this.clearForm}>Clear</button>
@@ -125,8 +205,6 @@ class SearchForm extends Component {
 }
 
 function mapStateToProps(state) {
-  console.log("mapping state")
-  console.log(state)
   const res = {
     loading: state.results.loading
   }

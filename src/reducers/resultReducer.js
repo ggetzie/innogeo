@@ -2,7 +2,8 @@ import { FETCH_RESULTS, SET_LOADING } from "../actions/types";
 
 const initialState = {
     papers: [],
-    loading: false
+    loading: false,
+    searched: false
 }
 
 export default function(state=initialState, action) {
@@ -13,6 +14,7 @@ export default function(state=initialState, action) {
                     ...state,
                     papers: action.payload.data.hits.hits,
                     loading: false,
+                    searched: true
                 };
             } catch(error) {
                 console.log(error);
@@ -20,7 +22,8 @@ export default function(state=initialState, action) {
                 return {
                     ...state,
                     papers: [],
-                    loading: false
+                    loading: false,
+                    searched: true,
                 };
             }
         case SET_LOADING:
