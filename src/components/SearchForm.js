@@ -154,7 +154,8 @@ class CitySearch extends Component {
           value={this.state.value} 
           onChange={this.handleChange} 
           onKeyDown={this.handleKeyDown} 
-          name="city" />
+          name="city" 
+          placeholder="Start typing to search for a city." />
         <div className="ac_container">
           {content}
         </div>
