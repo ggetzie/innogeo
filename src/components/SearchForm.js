@@ -5,8 +5,8 @@ import { setLoading } from '../actions/loadingActions'
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { debounce } from "lodash";
+import { ES_URL } from '../lib/util';
 
-const ES_URL = 'https://1z85a4how2.execute-api.us-east-1.amazonaws.com/search_es'
 const DEBOUNCE_DELAY = 500;
 
 class CitySearch extends Component {
@@ -229,7 +229,21 @@ class SearchForm extends Component {
         filter: filter_items
       }
     }
-    this.props.fetchResults(query)
+    const search_params = {
+      size: 100,
+      query: query,
+      aggs: {
+        "large-grid": {
+          geohash_grid:{
+            field: "locations",
+            precision: 4
+          }
+        }
+      }
+    }
+    console.log("sending query");
+    console.log(JSON.stringify(query));
+    this.props.fetchResults(search_params)
   }
 
   render() {

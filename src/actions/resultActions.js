@@ -1,5 +1,6 @@
 import { FETCH_RESULTS } from "./types"
 import axios from 'axios';
+import { ES_URL } from '../lib/util'
 
 // export const fetchResults = query => dispatch => {
 //     axios
@@ -11,9 +12,9 @@ import axios from 'axios';
 //     })));
 // };
 
-export const fetchResults = query => dispatch => {
+export const fetchResults = search_params => dispatch => {
     axios
-    .post('https://1z85a4how2.execute-api.us-east-1.amazonaws.com/search_es', { size: 1000, query: query })
+    .post(ES_URL, search_params)
     .then(( res ) => {
         console.log("results from post")
         console.log(res);
