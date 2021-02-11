@@ -50,6 +50,9 @@ const IndexPage = () => {
           <div className="map-col">
             <Map ref={mapRef} {...mapSettings}>
             </Map>
+            <div className="stats">
+              Stats go here
+            </div>
           </div>
           
         </div>

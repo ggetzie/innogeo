@@ -1,8 +1,12 @@
 .page-home {
 
-  .map,
-  .map-base {
-    height: calc(-72px + 100vh);
+  // .map,
+  // .map-base {
+  //   height: calc(-72px + 100vh);
+  // }
+
+  .map {
+    height: calc(-272px + 100vh);
   }
 
   main {
@@ -13,6 +17,11 @@
     display: flex;
     flex-direction: row;
     height: calc(-72px + 100vh);
+  }
+
+  .stats {
+    height: 200px;
+    display: block;
   }
 
   .map-col {

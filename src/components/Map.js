@@ -56,12 +56,8 @@ const Map = React.forwardRef(( props, ref ) => {
 
   // locate papers on the map
   const papers = useSelector((state) => state.results.papers)
-  console.log("papers in map component")
-  console.log(papers)
-
+  
   const affiliations = getAffiliations(papers)
-  console.log("affiliation set")
-  console.log(affiliations)
 
   const services = useMapServices({
     names: [...new Set([defaultBaseMap, DEFAULT_MAP_SERVICE])],
