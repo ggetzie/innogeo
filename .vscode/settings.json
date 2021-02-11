@@ -11,7 +11,10 @@
   "cSpell.ignoreWords": [
     "asciiname",
     "basemap",
+    "bbox",
+    "bcdefghjkmnpqrstuvwxyz",
     "bottomright",
+    "decode",
     "innogeo"
   ]
 }
