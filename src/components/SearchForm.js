@@ -236,7 +236,7 @@ class SearchForm extends Component {
         "large-grid": {
           geohash_grid:{
             field: "locations",
-            precision: 4
+            precision: 3
           }
         }
       }

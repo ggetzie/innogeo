@@ -94,7 +94,11 @@ const Map = React.forwardRef(( props, ref ) => {
   const polygons = paper_buckets.map((bucket) => {
     let positions = bbox_to_pairs(decode_bbox(bucket.key));
     return (
-      <Polygon positions={positions} color="red"></Polygon>
+      <Polygon positions={positions} color="red">
+        <Popup>
+          {bucket.doc_count} papers in this area
+        </Popup>
+      </Polygon>
     )
   });
 
