@@ -57,8 +57,6 @@ class SearchResults extends Component {
     } else {
       resultHits = <p>Enter query above and click "Submit" to search.</p>
     }
-    
-
     return (
       <div>
           <React.Fragment>
@@ -74,6 +72,7 @@ function mapStateToProps(state) {
   console.log(state)
   const res = {
     papers: state.results.papers,
+    paper_buckets: state.results.paper_buckets,
     searched: state.results.searched
   }
   return res;
@@ -81,6 +80,7 @@ function mapStateToProps(state) {
 
 SearchResults.propTypes = {
   papers: PropTypes.array.isRequired,
+  paper_buckets: PropTypes.array.isRequired,
   searched: PropTypes.bool
 }
 

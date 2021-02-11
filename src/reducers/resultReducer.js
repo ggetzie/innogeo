@@ -2,6 +2,7 @@ import { FETCH_RESULTS, SET_LOADING } from "../actions/types";
 
 const initialState = {
     papers: [],
+    paper_buckets: [],
     loading: false,
     searched: false
 }
@@ -13,6 +14,7 @@ export default function(state=initialState, action) {
                 return {
                     ...state,
                     papers: action.payload.data.hits.hits,
+                    paper_buckets: action.payload.data.aggregations["large-grid"].buckets,
                     loading: false,
                     searched: true
                 };
