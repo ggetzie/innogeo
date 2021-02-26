@@ -43,11 +43,8 @@ const Map = React.forwardRef(( props, ref ) => {
   // locate papers on the map
   const papers = useSelector((state) => state.results.papers)
   const paper_buckets = useSelector((state) => state.results.paper_buckets)
-  console.log("paper buckets in map");
-  console.log(paper_buckets);
-
-
-  const affiliations = getAffiliations(papers)
+  
+  // const affiliations = getAffiliations(papers)
 
   const services = useMapServices({
     names: [...new Set([defaultBaseMap, DEFAULT_MAP_SERVICE])],
@@ -101,8 +98,6 @@ const Map = React.forwardRef(( props, ref ) => {
       </Polygon>
     )
   });
-
-  console.log(polygons);
 
   return (
     <div className={mapClassName}>

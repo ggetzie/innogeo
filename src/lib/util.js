@@ -9,8 +9,19 @@ export function isDomAvailable() {
 }
 
  export const ES_URL = 'https://1z85a4how2.execute-api.us-east-1.amazonaws.com/search_es'
-// [minLat, minLong, maxLat, maxLong]
+
+
  export function bbox_to_pairs(arr) {
+   // arr = [minLat, minLong, maxLat, maxLong]
+   // Transform to
+  //  [
+  //    [
+  //      [minLat, minLong],
+  //      [minLat, maxLong],
+  //      [maxLat, maxLong],
+  //      [maxLat, minLong]
+  //    ]
+  //  ]
    return [
      [
        [arr[0], arr[1]],

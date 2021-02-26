@@ -232,6 +232,7 @@ class SearchForm extends Component {
     const search_params = {
       size: 100,
       query: query,
+      index: "papers",
       aggs: {
         "large-grid": {
           geohash_grid:{
@@ -241,8 +242,6 @@ class SearchForm extends Component {
         }
       }
     }
-    console.log("sending query");
-    console.log(JSON.stringify(query));
     this.props.fetchResults(search_params)
   }
 
