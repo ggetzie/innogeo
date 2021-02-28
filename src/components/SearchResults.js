@@ -71,8 +71,8 @@ function mapStateToProps(state) {
   console.log("mapping state")
   console.log(state)
   const res = {
-    papers: state.results.papers,
-    paper_buckets: state.results.paper_buckets,
+    papers: state.results.papers.hits,
+    paper_buckets: state.results.papers.buckets,
     searched: state.results.searched
   }
   return res;

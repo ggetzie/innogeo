@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import { debounce } from "lodash";
 import { ES_URL } from '../lib/util';
+import Form from 'react-bootstrap/Form';
 
 const DEBOUNCE_DELAY = 500;
 
@@ -146,11 +147,10 @@ class CitySearch extends Component {
       content = cityOptions;
     }
     return (
-      <div className="form-group">
-        <label htmlFor="city">City</label>
-        <input 
+      <Form.Group controlId="city">
+        <Form.Label htmlFor="city">City</Form.Label>
+        <Form.Control
           type="text" 
-          className="form-control" 
           value={this.state.value} 
           onChange={this.handleChange} 
           onKeyDown={this.handleKeyDown} 
@@ -159,7 +159,7 @@ class CitySearch extends Component {
         <div className="ac_container">
           {content}
         </div>
-      </div>
+      </Form.Group>
     )
 
   }
@@ -174,6 +174,9 @@ class SearchForm extends Component {
       minYear: "",
       maxYear: "",
       location: [],
+      papers: true,
+      patents: true,
+      results: 1000
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -197,6 +200,8 @@ class SearchForm extends Component {
       minYear: "",
       maxYear: "",
       location: [],
+      papers: true,
+      patents: true,
     })
   }
 
@@ -251,32 +256,39 @@ class SearchForm extends Component {
       content = <div className="spinner"></div>
     } else {
       content = (
-      <form onSubmit={this.handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="terms">Keywords</label>
-          <input className="form-control" type="text" value={this.state.terms} onChange={this.handleChange} name="terms" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="author">Author</label>
-          <input className="form-control" type="text" value={this.state.author} onChange={this.handleChange} name="author" />
-        </div>
-        <p>Search for papers published between:</p>
-        <div className="form-row">
-          <div className="form-group col">
-            <label htmlFor="minYear">Start Year</label>
-            <input className="form-control" type="number" value={this.state.minYear} onChange={this.handleChange} name="minYear" />
-          </div>
-          <div className="form-group col">
-            <label htmlFor="maxYear">End Year</label>
-            <input className="form-control" type="number" value={this.state.maxYear} onChange={this.handleChange} name="maxYear" />
-          </div>
-        </div>
+        <Form onSubmit={this.handleSubmit}>
+          <Form.Group controlId="terms">
+            <Form.Label htmlFor="terms">
+              Keywords
+            </Form.Label>
+            <Form.Control type="text" value={this.state.terms} onChange={this.handleChange} name="terms" />
+          </Form.Group>
+          <Form.Group controlId="author">
+            <Form.Label htmlFor="author">Author</Form.Label>
+            <Form.Control type="text" value={this.state.author} onChange={this.handleChange} name="author" />
+          </Form.Group>
+          <Form.Text>
+            Search for papers published between:
+          </Form.Text>
+          <Form.Row>
+            <Form.Group className="col" controlId="minYear">
+              <Form.Label htmlFor="minYear">Start Year</Form.Label>
+              <Form.Control type="number" value={this.state.minYear} onChange={this.handleChange} name="minYear" />
+            </Form.Group>
+            <Form.Group className="col" controlId="maxYear">
+              <Form.Label htmlFor="maxYear">
+                End Year
+              </Form.Label>
+              <Form.Control type="number" value={this.state.maxYear} onChange={this.handleChange} name="maxYear" />
+            </Form.Group>
+          </Form.Row>
         <CitySearch setLocation={this.setLocation} />
         <div className="d-flex flex-row-reverse">
           <input className="btn btn-primary" type="submit" value="Submit" />
           <button className="btn btn-secondary mr-2" role="button" onClick={this.clearForm}>Clear</button>
         </div>
-      </form>
+
+        </Form>
       )
     }
     

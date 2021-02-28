@@ -1,8 +1,14 @@
 import { FETCH_RESULTS, SET_LOADING } from "../actions/types";
 
 const initialState = {
-    papers: [],
-    paper_buckets: [],
+    papers: {
+        hits: [],
+        buckets: []
+    },
+    patents: {
+        hits: [],
+        buckets: []
+    },
     loading: false,
     searched: false
 }
@@ -13,8 +19,10 @@ export default function(state=initialState, action) {
             try {
                 return {
                     ...state,
-                    papers: action.payload.data.hits.hits,
-                    paper_buckets: action.payload.data.aggregations["large-grid"].buckets,
+                    papers: {
+                        hits: action.payload.data.hits.hits,
+                        buckets:action.payload.data.aggregations["large-grid"].buckets,
+                    },
                     loading: false,
                     searched: true
                 };
@@ -23,7 +31,7 @@ export default function(state=initialState, action) {
                 console.log(action.payload);
                 return {
                     ...state,
-                    papers: [],
+                    papers: {},
                     loading: false,
                     searched: true,
                 };
