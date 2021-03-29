@@ -43,6 +43,7 @@ const Map = React.forwardRef(( props, ref ) => {
   // locate papers on the map
   const papers = useSelector((state) => state.results.papers.hits)
   const paper_buckets = useSelector((state) => state.results.papers.buckets)
+  console.log(paper_buckets)
   
   // const affiliations = getAffiliations(papers)
 

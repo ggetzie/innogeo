@@ -147,7 +147,7 @@ class CitySearch extends Component {
       content = cityOptions;
     }
     return (
-      <Form.Group controlId="city">
+      <Form.Group>
         <Form.Label htmlFor="city">City</Form.Label>
         <Form.Control
           type="text" 
@@ -161,7 +161,6 @@ class CitySearch extends Component {
         </div>
       </Form.Group>
     )
-
   }
 }
 
@@ -182,10 +181,16 @@ class SearchForm extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.clearForm = this.clearForm.bind(this);
     this.setLocation = this.setLocation.bind(this);
+    this.paperParams = this.paperParams.bind(this);
   }
 
   handleChange(event) {
-    this.setState({[event.target.name]: event.target.value});
+    if (event.target.type === "checkbox") {
+      this.setState({[event.target.name]: event.target.checked});
+    } else {
+      this.setState({[event.target.name]: event.target.value});
+    }
+    
   }
 
   setLocation(location) {
@@ -202,12 +207,11 @@ class SearchForm extends Component {
       location: [],
       papers: true,
       patents: true,
+      results: 1000,
     })
   }
 
-  handleSubmit( event ) {
-    event.preventDefault();
-    this.props.setLoading();
+  paperParams() {
     let must_items = [];
     let filter_items = [];
     if (this.state.terms) {
@@ -235,19 +239,71 @@ class SearchForm extends Component {
       }
     }
     const search_params = {
-      size: 100,
+      size: this.state.results,
       query: query,
       index: "papers",
-      aggs: {
-        "large-grid": {
-          geohash_grid:{
-            field: "locations",
-            precision: 3
-          }
+    }
+    return search_params
+  }
+
+  patentParams() {
+    let must_items = [];
+    let filter_items = [];
+    if (this.state.terms) {
+      must_items.push({
+        multi_match: {
+          query: this.state.terms,
+          fields: ["title", "abstract"]
         }
+      });
+    }
+    if (this.state.author) {
+      must_items.push({match: {"inventors.name": this.state.author}});
+    }
+    if (this.state.minYear) {
+      minDate = `${minYear}-01-01`
+    } else {
+      minDate = "1776-07-04"
+    }
+    if (this.state.maxYear) {
+      maxDate = `${maxYear}-12-31`
+    } else {
+      const d = new Date();
+      maxDate=`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
+    }
+    if (this.state.minYear && this.state.maxYear) {
+      filter_items.push({range: {date: {gte: this.state.minYear, lte:this.state.maxYear}}})
+    }
+
+    if (this.state.location.length === 2) {
+      filter_items.push({geo_distance: {distance: "100km", locations: this.state.location}})
+    }
+    const query = {
+      bool: {
+        must: must_items,
+        filter: filter_items
       }
     }
-    this.props.fetchResults(search_params)
+    const search_params = {
+      size: this.state.results,
+      query: query,
+      index: "patents",
+    }
+    return search_params
+
+  }
+
+  handleSubmit( event ) {
+    event.preventDefault();
+    this.props.setLoading();
+    if (this.state.papers) {
+      this.props.fetchResults(this.paperParams())
+    }
+
+    if (this.state.patents) {
+      this.props.fetchResults(this.patentParams())
+    }
+    
   }
 
   render() {
@@ -257,32 +313,60 @@ class SearchForm extends Component {
     } else {
       content = (
         <Form onSubmit={this.handleSubmit}>
-          <Form.Group controlId="terms">
+          <Form.Group>
             <Form.Label htmlFor="terms">
               Keywords
             </Form.Label>
             <Form.Control type="text" value={this.state.terms} onChange={this.handleChange} name="terms" />
           </Form.Group>
-          <Form.Group controlId="author">
+          <Form.Group>
             <Form.Label htmlFor="author">Author</Form.Label>
             <Form.Control type="text" value={this.state.author} onChange={this.handleChange} name="author" />
           </Form.Group>
-          <Form.Text>
+          <Form.Text as="p">
             Search for papers published between:
           </Form.Text>
           <Form.Row>
-            <Form.Group className="col" controlId="minYear">
+            <Form.Group className="col">
               <Form.Label htmlFor="minYear">Start Year</Form.Label>
               <Form.Control type="number" value={this.state.minYear} onChange={this.handleChange} name="minYear" />
             </Form.Group>
-            <Form.Group className="col" controlId="maxYear">
+            <Form.Group className="col">
               <Form.Label htmlFor="maxYear">
                 End Year
               </Form.Label>
               <Form.Control type="number" value={this.state.maxYear} onChange={this.handleChange} name="maxYear" />
             </Form.Group>
           </Form.Row>
-        <CitySearch setLocation={this.setLocation} />
+          <CitySearch setLocation={this.setLocation} />
+
+          <Form.Row>
+            <Form.Group className="col">
+              <Form.Row>
+                <Form.Group className="col">
+                  <Form.Text as="p">Search for:</Form.Text>
+                </Form.Group>
+              </Form.Row>
+              <Form.Row>
+                <Form.Group className="col">
+                  <Form.Check inline label="patents" type="checkbox" onChange={this.handleChange} name="patents" checked={this.state.patents} />
+                </Form.Group>
+                <Form.Group className="col">
+                  <Form.Check inline label="papers" type="checkbox" onChange={this.handleChange} name="papers" checked={this.state.papers} />
+                </Form.Group>
+              </Form.Row>
+            </Form.Group>
+            <Form.Group className="col">
+              <Form.Label htmlFor="result_quantity">Number of Results to return</Form.Label>
+              <Form.Control as="select" name="result_quantity" onChange={this.handleChange} value={this.state.result_quantity}>
+                <option>1000</option>
+                <option>5000</option>
+                <option>10000</option>
+                <option>all</option>
+              </Form.Control>
+            </Form.Group>
+          </Form.Row>
+
         <div className="d-flex flex-row-reverse">
           <input className="btn btn-primary" type="submit" value="Submit" />
           <button className="btn btn-secondary mr-2" role="button" onClick={this.clearForm}>Clear</button>

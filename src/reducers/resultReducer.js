@@ -3,11 +3,11 @@ import { FETCH_RESULTS, SET_LOADING } from "../actions/types";
 const initialState = {
     papers: {
         hits: [],
-        buckets: []
+        buckets: [],
     },
     patents: {
         hits: [],
-        buckets: []
+        buckets: [],
     },
     loading: false,
     searched: false
@@ -20,8 +20,7 @@ export default function(state=initialState, action) {
                 return {
                     ...state,
                     papers: {
-                        hits: action.payload.data.hits.hits,
-                        buckets:action.payload.data.aggregations["large-grid"].buckets,
+                        hits: action.payload.hits,
                     },
                     loading: false,
                     searched: true
