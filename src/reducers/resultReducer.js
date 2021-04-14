@@ -4,10 +4,14 @@ const initialState = {
     papers: {
         hits: [],
         buckets: [],
+        complete: false,
+        search_after: "",
     },
     patents: {
         hits: [],
         buckets: [],
+        complete: false,
+        search_after: "",
     },
     loading: false,
     searched: false

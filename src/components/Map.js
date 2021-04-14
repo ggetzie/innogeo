@@ -42,10 +42,10 @@ const Map = React.forwardRef(( props, ref ) => {
 
   // locate papers on the map
   const papers = useSelector((state) => state.results.papers.hits)
-  const paper_buckets = useSelector((state) => state.results.papers.buckets)
-  console.log(paper_buckets)
+  // const paper_buckets = useSelector((state) => state.results.papers.buckets)
+  // console.log(paper_buckets)
   
-  // const affiliations = getAffiliations(papers)
+  const affiliations = getAffiliations(papers)
 
   const services = useMapServices({
     names: [...new Set([defaultBaseMap, DEFAULT_MAP_SERVICE])],
@@ -71,41 +71,40 @@ const Map = React.forwardRef(( props, ref ) => {
     zoomControl: false,
     ...rest,
   };
-  // const affiliationMarkers = affiliations.map((aff) => (
-  //   <Marker key={aff.id} position={aff.coordinates}>
-  //     <Popup>
-  //       {aff.name} - [{aff.coordinates[0]}, {aff.coordinates[1]}]
-  //     </Popup>
-  //   </Marker>
-  // ))
+  const affiliationMarkers = affiliations.map((aff) => (
+    <Marker key={aff.id} position={aff.coordinates}>
+      <Popup>
+        {aff.name} - [{aff.coordinates[0]}, {aff.coordinates[1]}]
+      </Popup>
+    </Marker>
+  ))
 
-  // const collaborationLines = papers
-  // .filter((paper) => (paper._source.locations.length > 1))
-  // .map((paper) => (
-  //   <Polyline 
-  //   key={paper._source.paper_id} 
-  //   positions={paper._source.locations.map((l) => l.reverse())}
-  //   color="magenta">
-  //   </Polyline>
-  // ))
+  const collaborationLines = papers
+  .filter((paper) => (paper._source.locations.length > 1))
+  .map((paper) => (
+    <Polyline 
+    key={paper._source.paper_id} 
+    positions={paper._source.locations.map((l) => l.reverse())}
+    color="magenta">
+    </Polyline>
+  ))
 
-  const polygons = paper_buckets.map((bucket) => {
-    let positions = bbox_to_pairs(decode_bbox(bucket.key));
-    return (
-      <Polygon positions={positions} color="red">
-        <Popup>
-          {bucket.doc_count} papers in this area
-        </Popup>
-      </Polygon>
-    )
-  });
+  // const polygons = paper_buckets.map((bucket) => {
+  //   let positions = bbox_to_pairs(decode_bbox(bucket.key));
+  //   return (
+  //     <Polygon positions={positions} color="red">
+  //       <Popup>
+  //         {bucket.doc_count} papers in this area
+  //       </Popup>
+  //     </Polygon>
+  //   )
+  // });
 
   return (
     <div className={mapClassName}>
       <BaseMap ref={mapRef} {...mapSettings}>
-        {polygons}
-        {/* {affiliationMarkers}
-        {collaborationLines} */}
+        {affiliationMarkers}
+        {collaborationLines}
         { children }
         { basemap && <TileLayer {...basemap} /> }
         <ZoomControl position="bottomright" />

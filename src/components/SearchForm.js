@@ -239,9 +239,10 @@ class SearchForm extends Component {
       }
     }
     const search_params = {
-      size: this.state.results,
+      size: 3000,
       query: query,
       index: "papers",
+      sort: ["_score", "_doc"]
     }
     return search_params
   }
@@ -285,9 +286,10 @@ class SearchForm extends Component {
       }
     }
     const search_params = {
-      size: this.state.results,
+      size: 3000,
       query: query,
       index: "patents",
+      sort: ["_score", "_doc"]
     }
     return search_params
 
@@ -355,15 +357,6 @@ class SearchForm extends Component {
                   <Form.Check inline label="papers" type="checkbox" onChange={this.handleChange} name="papers" checked={this.state.papers} />
                 </Form.Group>
               </Form.Row>
-            </Form.Group>
-            <Form.Group className="col">
-              <Form.Label htmlFor="result_quantity">Number of Results to return</Form.Label>
-              <Form.Control as="select" name="result_quantity" onChange={this.handleChange} value={this.state.result_quantity}>
-                <option>1000</option>
-                <option>5000</option>
-                <option>10000</option>
-                <option>all</option>
-              </Form.Control>
             </Form.Group>
           </Form.Row>
 
