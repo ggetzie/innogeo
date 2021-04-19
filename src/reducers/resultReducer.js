@@ -1,17 +1,18 @@
-import { FETCH_RESULTS, SET_LOADING } from "../actions/types";
+import { 
+    FETCH_RESULTS, 
+    SET_LOADING, 
+    CLEAR_RESULTS,
+    SAVE_PAPERS,
+    SAVE_PATENTS } from "../actions/types";
 
 const initialState = {
     papers: {
         hits: [],
         buckets: [],
-        complete: false,
-        search_after: "",
     },
     patents: {
         hits: [],
         buckets: [],
-        complete: false,
-        search_after: "",
     },
     loading: false,
     searched: false
@@ -34,7 +35,10 @@ export default function(state=initialState, action) {
                 console.log(action.payload);
                 return {
                     ...state,
-                    papers: {},
+                    papers: {
+                        hits: [],
+                        buckets: [],
+                    },
                     loading: false,
                     searched: true,
                 };
@@ -43,6 +47,27 @@ export default function(state=initialState, action) {
             return {
                 ...state,
                 loading: action.payload,
+            }
+        case CLEAR_RESULTS:
+            return {
+                ...state,
+                ...initialState
+            }
+        case SAVE_PAPERS:
+            return {
+                ...state,
+                papers: {
+                    hits: action.payload,
+                    buckets: [],
+                }
+            }
+        case SAVE_PATENTS:
+            return {
+                ...state,
+                papers: {
+                    hits: action.payload,
+                    buckets: []
+                }
             }
         default:
             return state;        

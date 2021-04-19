@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchResults } from '../actions/resultActions';
+import { 
+  fetchResults, 
+  clearResults,
+  savePapers,
+  savePatents,
+} from '../actions/resultActions';
 import { setLoading } from '../actions/loadingActions'
 import PropTypes from 'prop-types';
 import axios from 'axios';
@@ -298,14 +303,21 @@ class SearchForm extends Component {
   handleSubmit( event ) {
     event.preventDefault();
     this.props.setLoading();
+    this.props.clearResults();
     if (this.state.papers) {
-      this.props.fetchResults(this.paperParams())
+      fetchAllHits(this.paperParams()).then(hits => {
+        console.log(`Saving ${hits.length} papers`)
+        this.props.savePapers(hits);
+        
+      });
     }
 
     if (this.state.patents) {
-      this.props.fetchResults(this.patentParams())
+        fetchAllHits(this.patentParams()).then(hits => {
+          console.log(`Saving ${hits.length} patents`)
+          this.props.savePapers(hits);
+      });
     }
-    
   }
 
   render() {
@@ -383,13 +395,50 @@ class SearchForm extends Component {
 
 function mapStateToProps(state) {
   const res = {
-    loading: state.results.loading
+    loading: state.results.loading,
+    papers: state.results.papers,
+    patents: state.results.patents
   }
+  console.log("state in searchForm")
+  console.log(res)
   return res;
+}
+
+async function fetchAllHits(search_params) {
+  let sp = JSON.parse(JSON.stringify(search_params));
+  let complete = false;
+  let hits = [];
+  let resLen;
+  let sa;
+  do {
+    console.log("searching with parameters");
+    console.log(sp);
+    await axios.post(ES_URL, sp).then(res => {
+      console.log("got response");
+      console.log(res);
+      hits = hits.concat(res.data.hits.hits)
+      resLen = res.data.hits.hits.length;
+      sa = res.data.hits.hits[resLen - 1].sort
+    })
+    if (hits.length >= 10000 || resLen == 0) {
+      console.log("finished getting results");
+      complete = true
+    } else {
+      console.log(`Searching after ${sa}`);
+      sp.search_after = sa
+    }
+  } while (!complete);
+  return hits
 }
 
 SearchForm.propTypes = {
   fetchResults: PropTypes.func.isRequired
 }
 
-export default connect(mapStateToProps, {fetchResults, setLoading})(SearchForm);
+export default connect(mapStateToProps, {
+  fetchResults, 
+  setLoading, 
+  clearResults,
+  savePapers,
+  savePapers,
+})(SearchForm);

@@ -14,6 +14,8 @@ const DEFAULT_MAP_SERVICE = 'OpenStreetMap';
 // const HongKong = [22.283262, 114.160486];
 
 function getAffiliations(papers) {
+  console.log("papers in getAffiliations");
+  console.log(papers)
   let affIdSet = new Set();
   let affiliation_list = []
   for (let paper of papers) {
@@ -42,9 +44,7 @@ const Map = React.forwardRef(( props, ref ) => {
 
   // locate papers on the map
   const papers = useSelector((state) => state.results.papers.hits)
-  // const paper_buckets = useSelector((state) => state.results.papers.buckets)
-  // console.log(paper_buckets)
-  
+      
   const affiliations = getAffiliations(papers)
 
   const services = useMapServices({

@@ -1,4 +1,9 @@
-import { FETCH_RESULTS } from "./types"
+import { 
+    FETCH_RESULTS, 
+    CLEAR_RESULTS, 
+    SAVE_PAPERS, 
+    SAVE_PATENTS
+    } from "./types"
 import axios from 'axios';
 import { ES_URL } from '../lib/util'
 
@@ -28,26 +33,47 @@ import { ES_URL } from '../lib/util'
 //   }
 // }
 
-async function fetchAllHits(search_params, soFar=0) {
-    console.log(`Fetching hits: soFar=${soFar}`)
+export const fetchResults = (search_params, soFar, search_after) => dispatch => {
     let sp = JSON.parse(JSON.stringify(search_params))
-    const response = await axios.post(ES_URL, sp)
-    const resHits = response.data.hits.hits;
-    if (resHits.length === 0) {
-        return []
-    } else if (soFar >= 100000) {
-        return resHits
-    } else {
-        sp.search_after = resHits[resHits.length -1].sort
-        return resHits.concat(await fetchAllHits(sp, soFar + resHits.length))
+    if (search_after !== "") {
+        sp.search_after = search_after;
     }
-}
+    axios.post(ES_URL, sp).then(res => {
+        console.log("response from ES");
+        console.log(res);
+        const resHits =  res.data.hits.hits
+        const hits = soFar.concat(resHits);
+        const complete = (hits.length >= 100000 || hits.length === 0);
+        const new_sa = complete ? "" : resHits[resHits.length -1].sort
+        return dispatch({
+            type:FETCH_RESULTS,
+            payload: {
+                hits: hits,
+                complete: complete,
+                search_after: new_sa
+            }
+        })
+    });
+};
 
-export const fetchResults = (search_params) => dispatch => {
-    const hits =  fetchAllHits(search_params, 0);
+
+export const clearResults = () => dispatch => {
     return dispatch({
-        type:FETCH_RESULTS,
-        payload: hits
+        type: CLEAR_RESULTS,
     })
 };
+
+export const savePapers = (hits) => dispatch => {
+    return dispatch({
+        type: SAVE_PAPERS,
+        payload: hits
+    })
+}
+
+export const savePatents = (hits) => dispatch => {
+    return dispatch({
+        type: SAVE_PATENTS,
+        payload: hits
+    })
+}
 
