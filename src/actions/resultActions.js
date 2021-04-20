@@ -19,21 +19,9 @@ import { ES_URL } from '../lib/util'
 
 // import axios from 'axios'
 
-// const baseUrl: string = 'https://api.worldbank.org/v2/country/'
-
-// const getIndicatorByCountry = async (country: string, indicator: string, page:number=1): Promise<[]> => {  
-//   const query = `${baseUrl}/${country}/indicator/${indicator}?page=${page}&format=json`
-//   const response = await axios.get(query)  
-//   const data = response.data
-
-//   if (data[0].pages > page) {
-//     return data.concat(await getIndicatorByCountry(country, indicator, page+1)) 
-//   } else {
-//     return data
-//   }
-// }
-
 export const fetchResults = (search_params, soFar, search_after) => dispatch => {
+    // keeping this for now, but results are fetched in the component
+    // and added to the store via savePapers and savePatents below
     let sp = JSON.parse(JSON.stringify(search_params))
     if (search_after !== "") {
         sp.search_after = search_after;

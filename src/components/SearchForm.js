@@ -218,7 +218,11 @@ class SearchForm extends Component {
 
   paperParams() {
     let must_items = [];
-    let filter_items = [];
+    let filter_items = [{
+      "script": {
+        "script": "doc['locations'].size() > 1"
+      }
+    }];
     if (this.state.terms) {
       must_items.push({
         multi_match: {
@@ -254,7 +258,11 @@ class SearchForm extends Component {
 
   patentParams() {
     let must_items = [];
-    let filter_items = [];
+    let filter_items = [{
+      "script": {
+        "script": "doc['locations'].size() > 1"
+      }
+    }];
     if (this.state.terms) {
       must_items.push({
         multi_match: {
