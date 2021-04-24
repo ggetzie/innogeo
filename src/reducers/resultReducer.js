@@ -64,7 +64,7 @@ export default function(state=initialState, action) {
         case SAVE_PATENTS:
             return {
                 ...state,
-                papers: {
+                patents: {
                     hits: action.payload,
                     buckets: []
                 }

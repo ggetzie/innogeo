@@ -258,9 +258,10 @@ class SearchForm extends Component {
 
   patentParams() {
     let must_items = [];
+    let minDate, maxDate;
     let filter_items = [{
       "script": {
-        "script": "doc['locations'].size() > 1"
+        "script": "doc['locations'].size() > 2"
       }
     }];
     if (this.state.terms) {
@@ -275,12 +276,12 @@ class SearchForm extends Component {
       must_items.push({match: {"inventors.name": this.state.author}});
     }
     if (this.state.minYear) {
-      minDate = `${minYear}-01-01`
+      minDate = `${this.state.minYear}-01-01`
     } else {
       minDate = "1776-07-04"
     }
     if (this.state.maxYear) {
-      maxDate = `${maxYear}-12-31`
+      maxDate = `${this.state.maxYear}-12-31`
     } else {
       const d = new Date();
       maxDate=`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
@@ -299,7 +300,7 @@ class SearchForm extends Component {
       }
     }
     const search_params = {
-      size: 3000,
+      size: 1000,
       query: query,
       index: "patents",
       sort: ["_score", "_doc"]
@@ -323,7 +324,7 @@ class SearchForm extends Component {
     if (this.state.patents) {
         fetchAllHits(this.patentParams()).then(hits => {
           console.log(`Saving ${hits.length} patents`)
-          this.props.savePapers(hits);
+          this.props.savePatents(hits);
       });
     }
   }
@@ -426,12 +427,13 @@ async function fetchAllHits(search_params) {
       console.log(res);
       hits = hits.concat(res.data.hits.hits)
       resLen = res.data.hits.hits.length;
-      sa = res.data.hits.hits[resLen - 1].sort
+      sa = resLen > 0 ? res.data.hits.hits[resLen - 1].sort : [];
     })
     if (hits.length >= 10000 || resLen == 0) {
       console.log("finished getting results");
       complete = true
     } else {
+      
       console.log(`Searching after ${sa}`);
       sp.search_after = sa
     }
@@ -448,5 +450,5 @@ export default connect(mapStateToProps, {
   setLoading, 
   clearResults,
   savePapers,
-  savePapers,
+  savePatents,
 })(SearchForm);

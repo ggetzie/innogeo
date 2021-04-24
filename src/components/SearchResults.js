@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from "prop-types";
+import Tabs from 'react-bootstrap/Tabs';
+import Tab from 'react-bootstrap/Tab';
 
 function AuthorItem(props) {
   let content = props.author.author_name
@@ -27,7 +29,7 @@ function PaperResult(props) {
   const authors = props.hit._source.authors.map((author) => (<AuthorItem key={author.author_id} author={author}/>))
   return (
     <div key={props.hit._source.paper_id} className="search-result">
-      <h3>Title: <span className="paper-title">{props.hit._source.paper_title}</span></h3>
+      <h3 className="paper-title">{props.hit._source.paper_title}</h3>
       <p className="year">{props.hit._source.year}</p>
       <h4>Fields of Study</h4>
       <p className="fos-list">
@@ -45,42 +47,77 @@ PaperResult.propTypes = {
   hit: PropTypes.object.isRequired
 }
 
+function PatentResult(props) {
+  console.log(`patent hit ${props.hit}`);
+  return (
+    <div key={props.hit._source.id} className="search-result">
+      <h3>{props.hit._source.title}</h3>
+    </div>
+  )
+}
+
+PatentResult.propTypes = {
+  hit: PropTypes.object.isRequired
+}
+
+function NoResults(props) {
+  return (
+    <p className="p-5">No Results Found</p>
+  )
+}
+
+function SearchInvite(props) {
+  return (
+    <p className="p-5">Enter a query above and click "Submit" to search</p>
+  )
+}
+
 class SearchResults extends Component {
     
   render() {
-    let resultHits;
+    let paperHits, patentHits;
     console.log(`searched = ${this.props.searched}`);
     if (this.props.papers.length > 0) {
-      resultHits = this.props.papers.map((hit) => <PaperResult key={hit._id} hit={hit} />);
+      paperHits = this.props.papers.map((hit) => <PaperResult key={hit._id} hit={hit} />);
     } else if (this.props.searched) {
-      resultHits = <p>No results found</p>
+      paperHits = <NoResults />
     } else {
-      resultHits = <p>Enter query above and click "Submit" to search.</p>
+      paperHits = <SearchInvite />
+    }
+    if (this.props.patents.length > 0) {
+      patentHits = this.props.patents.map((hit) => <PatentResult key={hit._id} hit={hit} />);
+    } else if (this.props.searched) {
+      patentHits = <NoResults />
+    } else {
+      patentHits = <SearchInvite />
     }
     return (
-      <div>
-          <React.Fragment>
-            <h2>Papers</h2>
-            {resultHits}
-          </React.Fragment>
-      </div>
+      <Tabs defaultActiveKey="papers" transition={false} id="search-results_tabs">
+        <Tab eventKey="papers" title="Papers">
+          {paperHits}
+        </Tab>
+        <Tab eventKey="patents" title="Patents">
+          {patentHits}
+        </Tab>
+      </Tabs>
     );
   }
 }
+
 function mapStateToProps(state) {
   console.log("mapping state")
   console.log(state)
   const res = {
     papers: state.results.papers.hits,
-    paper_buckets: state.results.papers.buckets,
-    searched: state.results.searched
+    patents: state.results.patents.hits,
+    searched: state.results.searched,
   }
   return res;
 }
 
 SearchResults.propTypes = {
   papers: PropTypes.array.isRequired,
-  paper_buckets: PropTypes.array.isRequired,
+  patents: PropTypes.array.isRequired,
   searched: PropTypes.bool
 }
 
