@@ -14,44 +14,45 @@ const initialState = {
         hits: [],
         buckets: [],
     },
-    loading: false,
+    loading: {
+        papers: {
+            isLoading: false,
+            total: 0,
+            relation: "eq",
+            received: 0,
+        },
+        patents: {
+            isLoading: false,
+            total: 0,
+            relation: "eq",
+            received: 0
+        }
+    },
     searched: false
 }
 
 export default function(state=initialState, action) {
     switch(action.type) {
-        case FETCH_RESULTS:
-            try {
-                return {
-                    ...state,
-                    papers: {
-                        hits: action.payload.hits,
-                    },
-                    loading: false,
-                    searched: true
-                };
-            } catch(error) {
-                console.log(error);
-                console.log(action.payload);
-                return {
-                    ...state,
-                    papers: {
-                        hits: [],
-                        buckets: [],
-                    },
-                    loading: false,
-                    searched: true,
-                };
-            }
         case SET_LOADING:
             return {
                 ...state,
-                loading: action.payload,
+                loading: {
+                    ...state.loading,
+                    ...action.payload
+                }
             }
         case CLEAR_RESULTS:
             return {
                 ...state,
-                ...initialState
+                papers: {
+                    hits: [],
+                    buckets: [],
+                },
+                patents: {
+                    hits: [],
+                    buckets: []
+                },
+                searched: false
             }
         case SAVE_PAPERS:
             return {
@@ -59,7 +60,8 @@ export default function(state=initialState, action) {
                 papers: {
                     hits: action.payload,
                     buckets: [],
-                }
+                },
+                searched: true
             }
         case SAVE_PATENTS:
             return {
@@ -67,7 +69,8 @@ export default function(state=initialState, action) {
                 patents: {
                     hits: action.payload,
                     buckets: []
-                }
+                },
+                searched: true
             }
         default:
             return state;        

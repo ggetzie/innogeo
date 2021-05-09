@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { 
-  fetchResults, 
   clearResults,
   savePapers,
   savePatents,
@@ -13,8 +12,17 @@ import { debounce } from "lodash";
 import { ES_URL } from '../lib/util';
 import Form from 'react-bootstrap/Form';
 
-const DEBOUNCE_DELAY = 500;
+function LoadingData(props) {
+  return (
+    <div className="loading-info">
+      <div className="spinner"></div>
+      <p>Received {props.ld.papers.received} of {props.ld.papers.relation === "gte" && ">"} {props.ld.papers.total} papers</p>
+      <p>Received {props.ld.patents.received} of {props.ld.patents.relation === "gte" && ">"} {props.ld.patents.total} patents</p>
+    </div>
+  )
+}
 
+const DEBOUNCE_DELAY = 500;
 class CitySearch extends Component {
   constructor (props) {
     super(props);
@@ -311,10 +319,9 @@ class SearchForm extends Component {
 
   handleSubmit( event ) {
     event.preventDefault();
-    this.props.setLoading();
     this.props.clearResults();
     if (this.state.papers) {
-      fetchAllHits(this.paperParams()).then(hits => {
+      fetchAllHits(this.paperParams(), this.props.setLoading).then(hits => {
         console.log(`Saving ${hits.length} papers`)
         this.props.savePapers(hits);
         
@@ -322,7 +329,7 @@ class SearchForm extends Component {
     }
 
     if (this.state.patents) {
-        fetchAllHits(this.patentParams()).then(hits => {
+        fetchAllHits(this.patentParams(), this.props.setLoading).then(hits => {
           console.log(`Saving ${hits.length} patents`)
           this.props.savePatents(hits);
       });
@@ -331,8 +338,8 @@ class SearchForm extends Component {
 
   render() {
     let content;
-    if (this.props.loading) {
-      content = <div className="spinner"></div>
+    if (this.props.loading.papers.isLoading || this.props.loading.patents.isLoading) {
+      content = <LoadingData ld={this.props.loading} />
     } else {
       content = (
         <Form onSubmit={this.handleSubmit}>
@@ -413,7 +420,7 @@ function mapStateToProps(state) {
   return res;
 }
 
-async function fetchAllHits(search_params) {
+async function fetchAllHits(search_params, loading_func) {
   let sp = JSON.parse(JSON.stringify(search_params));
   let complete = false;
   let hits = [];
@@ -428,12 +435,24 @@ async function fetchAllHits(search_params) {
       hits = hits.concat(res.data.hits.hits)
       resLen = res.data.hits.hits.length;
       sa = resLen > 0 ? res.data.hits.hits[resLen - 1].sort : [];
+      let loadingData = {};
+      loadingData[sp.index] = {
+        isLoading: true,
+        total: res.data.hits.total.value,
+        relation: res.data.hits.total.relation,
+        received: hits.length
+      }
+      loading_func(loadingData);
     })
     if (hits.length >= 10000 || resLen == 0) {
       console.log("finished getting results");
       complete = true
+      let loadingData = {};
+      loadingData[sp.index] = {
+        isLoading: false
+      }
+      loading_func(loadingData);
     } else {
-      
       console.log(`Searching after ${sa}`);
       sp.search_after = sa
     }
@@ -442,11 +461,13 @@ async function fetchAllHits(search_params) {
 }
 
 SearchForm.propTypes = {
-  fetchResults: PropTypes.func.isRequired
+  setLoading: PropTypes.func.isRequired,
+  clearResults: PropTypes.func.isRequired,
+  savePapers: PropTypes.func.isRequired,
+  savePatents: PropTypes.func.isRequired
 }
 
 export default connect(mapStateToProps, {
-  fetchResults, 
   setLoading, 
   clearResults,
   savePapers,

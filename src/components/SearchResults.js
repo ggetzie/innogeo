@@ -84,6 +84,7 @@ class SearchResults extends Component {
     } else {
       paperHits = <SearchInvite />
     }
+    
     if (this.props.patents.length > 0) {
       patentHits = this.props.patents.map((hit) => <PatentResult key={hit._id} hit={hit} />);
     } else if (this.props.searched) {
