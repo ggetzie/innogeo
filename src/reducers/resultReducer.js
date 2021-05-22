@@ -3,7 +3,10 @@ import {
     SET_LOADING, 
     CLEAR_RESULTS,
     SAVE_PAPERS,
-    SAVE_PATENTS } from "../actions/types";
+    SAVE_PATENTS,
+    LOADING_PAPERS,
+    LOADING_PATENTS,
+ } from "../actions/types";
 
 const initialState = {
     papers: {
@@ -20,12 +23,14 @@ const initialState = {
             total: 0,
             relation: "eq",
             received: 0,
+            search_after: "",
         },
         patents: {
             isLoading: false,
             total: 0,
             relation: "eq",
-            received: 0
+            received: 0,
+            search_after: "",
         }
     },
     searched: false
@@ -71,6 +76,19 @@ export default function(state=initialState, action) {
                     buckets: []
                 },
                 searched: true
+            }
+        case LOADING_PAPERS:
+            return {
+                ...state,
+                loading: {
+                    ...state.loading,
+                    papers: {
+                        isLoading: payload.isLoading,
+                        total: payload.total,
+                        relation: payload.relation,
+                        received: payload.received
+                    }
+                }
             }
         default:
             return state;        

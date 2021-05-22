@@ -1,9 +1,9 @@
-import { SET_LOADING } from "./types"
+import { 
+    SET_LOADING, 
+    LOADING_PAPERS, 
+    LOADING_PATENTS } from "./types"
 
-export const setLoading = (payload) => dispatch => {
-    console.log("setting loading")
-    return dispatch({
+export const setLoading = (payload) => ({
         type: SET_LOADING,
         payload: payload
     })
-}
