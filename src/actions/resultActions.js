@@ -19,26 +19,33 @@ export const savePatents = (hits) => ({
         payload: hits
 })
 
-export const thunkResults = (paper_params) => (dispatch, getState) => {
+export const thunkResults = (paper_params) => async (dispatch, getState) => {
+    dispatch({
+        type: LOADING_PAPERS,
+        payload: {
+            isLoading: true,
+            total: "calculating...",
+            relation: "eq",
+            received: "calculating...",
+        }
+    })
     const state = getState();
+    console.log("state in thunkResults");
+    console.log(state);
     // copy parameters to modify
     let sp = JSON.parse(JSON.stringify(paper_params));
     let complete = false;
-    let hits = state.papers.hits;
-    let resLen;
-    // store the last element of the current search to
-    // to search_after for the next search
-    let sa;
+    let hits = [];
     do {
         console.log("searching with parameters");
-        console.log("sp");
-        axios.post(ES_URL, sp).then(res => {
-         console.log("got response");
-         console.log(res)
-         hits = hits.concat(res.data.hits.hits);
-         resLen = res.data.hits.hits.length;
-         sa = resLen > 0 ? res.data.hits.hits[resLen-1].sort : [];
-         dispatch({
+        console.log(sp);
+        const res = await axios.post(ES_URL, sp);
+        console.log("awaited response");
+        console.log(res);
+        hits = hits.concat(res.data.hits.hits);
+        const resLen = res.data.hits.hits.length;
+        const search_after = resLen > 0 ? res.data.hits.hits[resLen-1].sort : [];
+        dispatch({
              type: LOADING_PAPERS,
              payload: {
                  isLoading:true,
@@ -47,24 +54,24 @@ export const thunkResults = (paper_params) => (dispatch, getState) => {
                  received: hits.length
              }
          })
-         // stop when we get no results or have more than 10000
-         if (hits.length >= 10000 || resLen ===0 ) {
+
+         if (hits.length >= 10000 || resLen === 0 ) {
+             // stop when we get no results or have more than 10000
              console.log("finished getting results");
              complete = true;
              dispatch({
                  type: LOADING_PAPERS,
                  payload: {
                      isLoading: false,
-                     total: 0,
-                     relation: "",
-                     received: 0
+                     total: "calculating...",
+                     relation: "eq",
+                     received: "calculating...",
                  }
              })
              dispatch(savePapers(hits));
          } else {
-             console.log(`Searching after ${sa}`);
-             sp.search_after = sa
+             console.log(`Searching after ${search_after}`);
+             sp.search_after = search_after;
          }
-        })
     } while (!complete)
 }

@@ -4,6 +4,7 @@ import {
   clearResults,
   savePapers,
   savePatents,
+  thunkResults
 } from '../actions/resultActions';
 import { setLoading } from '../actions/loadingActions'
 import PropTypes from 'prop-types';
@@ -321,11 +322,12 @@ class SearchForm extends Component {
     event.preventDefault();
     this.props.clearResults();
     if (this.state.papers) {
-      fetchAllHits(this.paperParams(), this.props.setLoading).then(hits => {
-        console.log(`Saving ${hits.length} papers`)
-        this.props.savePapers(hits);
+      this.props.thunkResults(this.paperParams());
+      // fetchAllHits(this.paperParams(), this.props.setLoading).then(hits => {
+      //   console.log(`Saving ${hits.length} papers`)
+      //   this.props.savePapers(hits);
         
-      });
+      // });
     }
 
     if (this.state.patents) {
@@ -472,4 +474,5 @@ export default connect(mapStateToProps, {
   clearResults,
   savePapers,
   savePatents,
+  thunkResults,
 })(SearchForm);

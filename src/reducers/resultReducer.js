@@ -20,16 +20,16 @@ const initialState = {
     loading: {
         papers: {
             isLoading: false,
-            total: 0,
+            total: "calculating...",
             relation: "eq",
-            received: 0,
+            received: "calculating...",
             search_after: "",
         },
         patents: {
             isLoading: false,
-            total: 0,
+            total: "calculating...",
             relation: "eq",
-            received: 0,
+            received: "calculating...",
             search_after: "",
         }
     },
@@ -83,10 +83,10 @@ export default function(state=initialState, action) {
                 loading: {
                     ...state.loading,
                     papers: {
-                        isLoading: payload.isLoading,
-                        total: payload.total,
-                        relation: payload.relation,
-                        received: payload.received
+                        isLoading: action.payload.isLoading,
+                        total: action.payload.total,
+                        relation: action.payload.relation,
+                        received: action.payload.received
                     }
                 }
             }
