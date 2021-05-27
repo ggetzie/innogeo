@@ -20,6 +20,7 @@ const initialState = {
     loading: {
         papers: {
             isLoading: false,
+            requested: false,
             total: "calculating...",
             relation: "eq",
             received: "calculating...",
@@ -27,6 +28,7 @@ const initialState = {
         },
         patents: {
             isLoading: false,
+            requested: false,
             total: "calculating...",
             relation: "eq",
             received: "calculating...",
@@ -83,10 +85,27 @@ export default function(state=initialState, action) {
                 loading: {
                     ...state.loading,
                     papers: {
-                        isLoading: action.payload.isLoading,
-                        total: action.payload.total,
-                        relation: action.payload.relation,
-                        received: action.payload.received
+                        ...action.payload
+                        // isLoading: action.payload.isLoading,
+                        // requested: action.payload.requested,
+                        // total: action.payload.total,
+                        // relation: action.payload.relation,
+                        // received: action.payload.received
+                    }
+                }
+            }
+        case LOADING_PATENTS:
+            return {
+                ...state,
+                loading: {
+                    ...state.loading,
+                    patents: {
+                        ...action.payload
+                        // isLoading: action.payload.isLoading,
+                        // requested: action.payload.requested,
+                        // total: action.payload.total,
+                        // relation: action.payload.relation,
+                        // received: action.payload.received
                     }
                 }
             }

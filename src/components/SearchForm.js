@@ -13,12 +13,27 @@ import { debounce } from "lodash";
 import { ES_URL } from '../lib/util';
 import Form from 'react-bootstrap/Form';
 
+function LoadingDetail(props) {
+  let content;
+  content = `Received ${props.data.received} of ${props.data.relation}${props.data.total} ${props.index}`;
+  if (!props.data.isLoading) {
+    content = `${props.index} completed. ` + content;
+  }
+  return (
+    <p>
+      {content}
+    </p>
+  )
+}
+
 function LoadingData(props) {
   return (
     <div className="loading-info">
       <div className="spinner"></div>
-      <p>Received {props.ld.papers.received} of {props.ld.papers.relation === "gte" && ">"} {props.ld.papers.total} papers</p>
-      <p>Received {props.ld.patents.received} of {props.ld.patents.relation === "gte" && ">"} {props.ld.patents.total} patents</p>
+      {props.ld.papers.requested && 
+        <LoadingDetail data={props.ld.papers} index="papers" />}
+      {props.ld.patents.requested &&
+        <LoadingDetail data={props.ld.patents} index="patents" />}
     </div>
   )
 }
@@ -331,10 +346,11 @@ class SearchForm extends Component {
     }
 
     if (this.state.patents) {
-        fetchAllHits(this.patentParams(), this.props.setLoading).then(hits => {
-          console.log(`Saving ${hits.length} patents`)
-          this.props.savePatents(hits);
-      });
+      this.props.thunkResults(this.patentParams());
+      //   fetchAllHits(this.patentParams(), this.props.setLoading).then(hits => {
+      //     console.log(`Saving ${hits.length} patents`)
+      //     this.props.savePatents(hits);
+      // });
     }
   }
 
@@ -420,46 +436,6 @@ function mapStateToProps(state) {
   console.log("state in searchForm")
   console.log(res)
   return res;
-}
-
-async function fetchAllHits(search_params, loading_func) {
-  let sp = JSON.parse(JSON.stringify(search_params));
-  let complete = false;
-  let hits = [];
-  let resLen;
-  let sa;
-  do {
-    console.log("searching with parameters");
-    console.log(sp);
-    await axios.post(ES_URL, sp).then(res => {
-      console.log("got response");
-      console.log(res);
-      hits = hits.concat(res.data.hits.hits)
-      resLen = res.data.hits.hits.length;
-      sa = resLen > 0 ? res.data.hits.hits[resLen - 1].sort : [];
-      let loadingData = {};
-      loadingData[sp.index] = {
-        isLoading: true,
-        total: res.data.hits.total.value,
-        relation: res.data.hits.total.relation,
-        received: hits.length
-      }
-      loading_func(loadingData);
-    })
-    if (hits.length >= 10000 || resLen == 0) {
-      console.log("finished getting results");
-      complete = true
-      let loadingData = {};
-      loadingData[sp.index] = {
-        isLoading: false
-      }
-      loading_func(loadingData);
-    } else {
-      console.log(`Searching after ${sa}`);
-      sp.search_after = sa
-    }
-  } while (!complete);
-  return hits
 }
 
 SearchForm.propTypes = {
