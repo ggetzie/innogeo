@@ -47,11 +47,69 @@ PaperResult.propTypes = {
   hit: PropTypes.object.isRequired
 }
 
+function InventorItem(props) {
+  content = props.inventor.name
+  const city = props.inventor.location.city;
+  const state = props.inventor.location.state;
+  const country = props.inventor.location.country;
+  if (city || state || country) {
+    content += " - "
+    if (city) {
+      content += city
+    }
+
+    if (state) {
+      if (city) {
+        content += `, ${state}`
+      } else {
+        content += state
+      }
+    }
+
+    if (country) {
+      content += ` ${country}`
+    }
+  }
+
+  return (
+    <li key={props.inventor.id}>
+      {content}
+    </li>
+  )
+}
+
+function CPCGroupItem(props) {
+  return (
+    <li key={props.group[0]}>
+      <details>
+        <summary>{props.group[0]}</summary>
+        <p>{props.group[1]}</p>
+      </details>
+    </li>
+  )
+}
+
 function PatentResult(props) {
-  console.log(`patent hit ${props.hit}`);
+  const inventors = props.hit._source.inventors.map((inventor) => (<InventorItem inventor={inventor}/>));
+  const cpc_groups = props.hit._source.cpc.groups.map((group, index) => (<CPCGroupItem key={index} group={group} />));
   return (
     <div key={props.hit._source.id} className="search-result">
       <h3>{props.hit._source.title}</h3>
+      <p className="m-0"><small>Patent ID: {props.hit._source.id}</small></p>
+      <p className="m-0"><small>{props.hit._source.date}</small></p>
+
+      <details>
+        <summary>Abstract</summary>
+        <p>{props.hit._source.abstract}</p>
+      </details>
+      <h4>CPC Groups</h4>
+      <ul>
+        {cpc_groups}
+      </ul>
+      <h4>Inventors</h4>
+      <ul>
+        {inventors}
+      </ul>
     </div>
   )
 }

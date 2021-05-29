@@ -442,7 +442,8 @@ SearchForm.propTypes = {
   setLoading: PropTypes.func.isRequired,
   clearResults: PropTypes.func.isRequired,
   savePapers: PropTypes.func.isRequired,
-  savePatents: PropTypes.func.isRequired
+  savePatents: PropTypes.func.isRequired,
+  thunkResults: PropTypes.func.isRequired
 }
 
 export default connect(mapStateToProps, {

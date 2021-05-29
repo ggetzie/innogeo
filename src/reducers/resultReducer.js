@@ -86,11 +86,6 @@ export default function(state=initialState, action) {
                     ...state.loading,
                     papers: {
                         ...action.payload
-                        // isLoading: action.payload.isLoading,
-                        // requested: action.payload.requested,
-                        // total: action.payload.total,
-                        // relation: action.payload.relation,
-                        // received: action.payload.received
                     }
                 }
             }
@@ -101,11 +96,6 @@ export default function(state=initialState, action) {
                     ...state.loading,
                     patents: {
                         ...action.payload
-                        // isLoading: action.payload.isLoading,
-                        // requested: action.payload.requested,
-                        // total: action.payload.total,
-                        // relation: action.payload.relation,
-                        // received: action.payload.received
                     }
                 }
             }
