@@ -49,18 +49,7 @@ export default function(state=initialState, action) {
                 }
             }
         case CLEAR_RESULTS:
-            return {
-                ...state,
-                papers: {
-                    hits: [],
-                    buckets: [],
-                },
-                patents: {
-                    hits: [],
-                    buckets: []
-                },
-                searched: false
-            }
+            return initialState
         case SAVE_PAPERS:
             return {
                 ...state,
