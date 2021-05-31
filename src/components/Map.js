@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import { useConfigureLeaflet, useMapServices } from 'hooks';
 import { isDomAvailable, bbox_to_pairs } from 'lib/util';
 import { useSelector } from "react-redux";
-import { decode_bbox } from "ngeohash";
+
 
 const DEFAULT_MAP_SERVICE = 'OpenStreetMap';
 
