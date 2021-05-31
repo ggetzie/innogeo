@@ -9,13 +9,13 @@ frontend:
   phases:
     preBuild:
       commands:
-        - nvm install 12.0.0
-        - nvm use 12.0.0
+        - nvm install 14.15.1
+        - nvm use 14.15.1
         - yarn install
     build:
       commands:
-        - nvm install 12.0.0
-        - nvm use 12.0.0
+        - nvm install 14.15.1
+        - nvm use 14.15.1
         - node -v
         - yarn run build
   artifacts:
