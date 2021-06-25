@@ -33,13 +33,15 @@ export function isDomAvailable() {
   ]
  }
 
-//  export class Graph {
-//    constructor() {
-//      this.adjacency_matrix = new Map()
-//    }
+ export class Graph {
+   constructor(itemArray) {
+     this.itemArray = itemArray;
+     this.edgeMap = new Map();
+     let i = 0;
+     for (const item of this.itemArray) {
+       hashes = Set(item.locations.map(x => encode([x[1], x[0]]).sort()));
 
-//    add_edge(e) {
 
-//    }
-
-//  }
+     }
+   }
+ }

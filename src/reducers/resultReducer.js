@@ -8,14 +8,18 @@ import {
     LOADING_PATENTS,
  } from "../actions/types";
 
+ import { Graph } from "../lib/util";
+
 const initialState = {
     papers: {
         hits: [],
         buckets: [],
+        graph: null,
     },
     patents: {
         hits: [],
         buckets: [],
+        graph: null,
     },
     loading: {
         papers: {
@@ -56,6 +60,7 @@ export default function(state=initialState, action) {
                 papers: {
                     hits: action.payload,
                     buckets: [],
+                    graph: new Graph(action.payload)
                 },
                 searched: true
             }
@@ -64,7 +69,8 @@ export default function(state=initialState, action) {
                 ...state,
                 patents: {
                     hits: action.payload,
-                    buckets: []
+                    buckets: [],
+                    graph: new Graph(action.payload)
                 },
                 searched: true
             }
