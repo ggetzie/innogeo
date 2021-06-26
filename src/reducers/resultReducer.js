@@ -14,7 +14,7 @@ const initialState = {
     papers: {
         hits: [],
         buckets: [],
-        graph: null,
+        graph: new Graph([]),
     },
     patents: {
         hits: [],

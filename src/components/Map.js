@@ -7,6 +7,7 @@ import { useConfigureLeaflet, useMapServices } from 'hooks';
 import { isDomAvailable, bbox_to_pairs } from 'lib/util';
 import { useSelector } from "react-redux";
 
+import { decode_bbox } from "ngeohash";
 
 const DEFAULT_MAP_SERVICE = 'OpenStreetMap';
 
@@ -44,7 +45,18 @@ const Map = React.forwardRef(( props, ref ) => {
 
   // locate papers on the map
   const papers = useSelector((state) => state.results.papers.hits)
-      
+  const paper_graph = useSelector((state) => state.results.papers.graph);
+
+  const vertices = paper_graph.bboxes();
+  
+  const rects = vertices.map(bb => (
+    <Polygon color="magenta" key={bb[0]} positions={bb[1]} />
+  ));
+
+  const lines = paper_graph.lines().map(kv => (
+    <Polyline color="blue" key={kv[0]} positions={kv[1].map(p => [p.latitude, p.longitude])} />
+  ));
+
   const affiliations = getAffiliations(papers)
 
   const services = useMapServices({
@@ -103,8 +115,10 @@ const Map = React.forwardRef(( props, ref ) => {
   return (
     <div className={mapClassName}>
       <BaseMap ref={mapRef} {...mapSettings}>
-        {affiliationMarkers}
-        {collaborationLines}
+        {/* {affiliationMarkers} */}
+        {/* {collaborationLines} */}
+        {rects}
+        {lines}
         { children }
         { basemap && <TileLayer {...basemap} /> }
         <ZoomControl position="bottomright" />
