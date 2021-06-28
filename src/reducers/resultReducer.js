@@ -6,6 +6,8 @@ import {
     SAVE_PATENTS,
     LOADING_PAPERS,
     LOADING_PATENTS,
+    SET_SELECTED,
+    CLEAR_SELECTED,
  } from "../actions/types";
 
  import { Graph } from "../lib/util";
@@ -39,7 +41,8 @@ const initialState = {
             search_after: "",
         }
     },
-    searched: false
+    searched: false,
+    selectedLine: null
 }
 
 export default function(state=initialState, action) {
@@ -93,6 +96,16 @@ export default function(state=initialState, action) {
                         ...action.payload
                     }
                 }
+            }
+        case SET_SELECTED:
+            return {
+                ...state,
+                selectedLine: action.payload
+            }
+        case CLEAR_SELECTED:
+            return {
+                ...state,
+                selectedLine: null
             }
         default:
             return state;        

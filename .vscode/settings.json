@@ -9,6 +9,7 @@
     "amplify/backend/awscloudformation": true
   },
   "cSpell.ignoreWords": [
+    "affs",
     "asciiname",
     "basemap",
     "bbox",
@@ -22,6 +23,8 @@
     "geohashes",
     "grid",
     "innogeo",
-    "ngeohash"
+    "latlong",
+    "ngeohash",
+    "pairs"
   ]
 }

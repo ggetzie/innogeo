@@ -1,13 +1,16 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Map as BaseMap, TileLayer, ZoomControl, Marker, Popup, Polyline, Polygon } from 'react-leaflet';
+import { 
+  Map as BaseMap, TileLayer, ZoomControl, 
+  Marker, Popup, Polyline, Polygon , Tooltip
+} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import { useConfigureLeaflet, useMapServices } from 'hooks';
 import { isDomAvailable, bbox_to_pairs } from 'lib/util';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
-import { decode_bbox } from "ngeohash";
+import { SET_SELECTED, CLEAR_SELECTED } from "../actions/types"
 
 const DEFAULT_MAP_SERVICE = 'OpenStreetMap';
 
@@ -35,6 +38,36 @@ function getAffiliations(papers) {
   return affiliation_list
 }
 
+function CollaborationLine(props) {
+  const [selected, setSelected] = useState(false);
+  const positions = props.kv[1].map(p => [p.latitude, p.longitude]);
+  const dispatch = useDispatch();
+  function clClick() {
+    setSelected(!selected);
+    // selected will still have previous value at this point
+    if (!selected) {
+      dispatch({
+        type: SET_SELECTED,
+        payload: props.kv[0]
+      })
+    } else {
+      dispatch({
+        type:CLEAR_SELECTED
+      })
+    }
+  }
+
+  return (
+    <Polyline 
+    positions={positions}
+    color={selected?"yellow":"blue"}
+    onclick={clClick}
+    >
+      <Tooltip>{props.kv[0]}</Tooltip>
+    </Polyline>
+  )
+}
+
 const Map = React.forwardRef(( props, ref ) => {
   const { children, className, defaultBaseMap = DEFAULT_MAP_SERVICE, ...rest } = props;
 
@@ -44,20 +77,48 @@ const Map = React.forwardRef(( props, ref ) => {
   const mapRef = ref || backupRef;
 
   // locate papers on the map
-  const papers = useSelector((state) => state.results.papers.hits)
+  // const papers = useSelector((state) => state.results.papers.hits)
   const paper_graph = useSelector((state) => state.results.papers.graph);
 
-  const vertices = paper_graph.bboxes();
+  const vertices = paper_graph.rects();
   
   const rects = vertices.map(bb => (
-    <Polygon color="magenta" key={bb[0]} positions={bb[1]} />
+    <React.Fragment key={`f_${bb.hash}`}>
+      <Polygon color="magenta" key={bb.hash} positions={bb.pairs} />
+      <Marker key={`m_${bb.hash}`} position={bb.latlong} >
+        <Popup>
+          <h3>Affiliations in this Area</h3>
+          <ul>
+            {
+              paper_graph.affiliationsInGeohash(bb.hash).map(aff => (
+                <li key={aff.affiliation_id}>{aff.affiliation_name}</li>
+              ))
+            }
+          </ul>
+        </Popup>
+      </Marker>
+    </React.Fragment>
   ));
 
-  const lines = paper_graph.lines().map(kv => (
-    <Polyline color="blue" key={kv[0]} positions={kv[1].map(p => [p.latitude, p.longitude])} />
+  // const lines = paper_graph.lines().map(kv => (
+  //   <Polyline 
+  //   color={this.props.selected?"yellow":"blue"} 
+  //   key={kv[0]} 
+  //   selected={false}
+  //   positions={kv[1].map(p => [p.latitude, p.longitude])} 
+  //   onclick={(e) => (console.log(e.target))}
+  //   />
+  // ));
+  console.log("paper_graph edgeMap")
+  for (let [key, value] of paper_graph.edgeMap) {
+    console.log(`${key}: ${value}`)
+  }
+
+    const lines = paper_graph.lines().map(kv => (
+    <CollaborationLine key={kv[0]} kv={kv} />
   ));
 
-  const affiliations = getAffiliations(papers)
+  // const affiliations = getAffiliations(papers)
 
   const services = useMapServices({
     names: [...new Set([defaultBaseMap, DEFAULT_MAP_SERVICE])],
@@ -83,23 +144,23 @@ const Map = React.forwardRef(( props, ref ) => {
     zoomControl: false,
     ...rest,
   };
-  const affiliationMarkers = affiliations.map((aff) => (
-    <Marker key={aff.id} position={aff.coordinates}>
-      <Popup>
-        {aff.name} - [{aff.coordinates[0]}, {aff.coordinates[1]}]
-      </Popup>
-    </Marker>
-  ))
+  // const affiliationMarkers = affiliations.map((aff) => (
+  //   <Marker key={aff.id} position={aff.coordinates}>
+  //     <Popup>
+  //       {aff.name} - [{aff.coordinates[0]}, {aff.coordinates[1]}]
+  //     </Popup>
+  //   </Marker>
+  // ))
 
-  const collaborationLines = papers
-  .filter((paper) => (paper._source.locations.length > 1))
-  .map((paper) => (
-    <Polyline 
-    key={paper._source.paper_id} 
-    positions={paper._source.locations.map((l) => l.reverse())}
-    color="magenta">
-    </Polyline>
-  ))
+  // const collaborationLines = papers
+  // .filter((paper) => (paper._source.locations.length > 1))
+  // .map((paper) => (
+  //   <Polyline 
+  //   key={paper._source.paper_id} 
+  //   positions={paper._source.locations.map((l) => l.reverse())}
+  //   color="magenta">
+  //   </Polyline>
+  // ))
 
   // const polygons = paper_buckets.map((bucket) => {
   //   let positions = bbox_to_pairs(decode_bbox(bucket.key));

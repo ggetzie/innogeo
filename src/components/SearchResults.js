@@ -164,8 +164,6 @@ class SearchResults extends Component {
 }
 
 function mapStateToProps(state) {
-  console.log("mapping state")
-  console.log(state)
   const res = {
     papers: state.results.papers.hits,
     patents: state.results.patents.hits,

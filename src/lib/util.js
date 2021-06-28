@@ -34,24 +34,68 @@ export function isDomAvailable() {
   ]
  }
 
+ class AffiliationMap {
+   // keep a list of all the affiliations indexed by geohash and affiliation_id
+   constructor(searchIndex) {
+     this.hashToAff = new Map();
+     this.searchIndex = searchIndex;
+   }
+
+   add(geohash, affiliation) {
+     if (this.hashToAff.has(geohash)) {
+       let affs = this.hashToAff.get(geohash);
+       affs.set(affiliation.affiliation_id, affiliation);
+       this.hashToAff.set(geohash, affs);
+     } else {
+       let affs = new Map();
+       affs.set(affiliation.affiliation_id, affiliation);
+       this.hashToAff.set(geohash, affs);
+     }
+   }
+
+   get(geohash) {
+     if (this.hashToAff.has(geohash)) {
+       const affs = this.hashToAff.get(geohash);
+       return [...affs.values()];
+     } else {
+       return [];
+     }
+   }
+ }
+
  export class Graph {
    constructor(itemArray) {
      this.itemArray = itemArray;
      this.edgeMap = new Map();
      this.vertices = new Set();
+     this.affMap = new AffiliationMap(); // {geohash: {affiliation_id: {affiliation}}
+     if (itemArray.length > 0) {
+       this.searchIndex = itemArray[0]._index;
+     } else {
+       this.searchIndex = null;
+     }
+     
      let i = 0;
      console.log("creating graph from items");
      console.log(itemArray);
      for (const item of this.itemArray) {
        // loop through the array of papers or patents and index them by 
        // the geohashes of their locations
-       let hashArray = item._source.locations.map(x => encode(x[1], x[0], 4));
-       hashArray = [...new Set(hashArray)]; // remove duplicates
-       hashArray = hashArray.sort();
+       let hashArray = [];
+       for (let a of item._source.authors) {
+         if (!a.affiliation || !a.affiliation.location) { continue; }
+         const aff = a.affiliation;
+         // elasticsearch stores coordinates as [longitude, latitude]
+         const longitude = aff.location[0];
+         const latitude = aff.location[1];
+         const geohash = encode(latitude, longitude, 3); 
+         hashArray.push(geohash);
+         this.affMap.add(geohash, aff);
+       }
        for (let v of hashArray) {
          this.vertices.add(v);
        }
-       const hashes = hashArray.join(",");
+       const hashes = [...new Set(hashArray)].sort().join(",");
        if (this.edgeMap.has(hashes)) {
          const indexList = this.edgeMap.get(hashes);
          this.edgeMap.set(hashes, indexList.concat(i));
@@ -62,21 +106,31 @@ export function isDomAvailable() {
      }
    }
 
-   bboxes() {
+   rects() {
      const verticesArray = [...this.vertices];
-     return verticesArray.map(gh => ([gh,bbox_to_pairs(decode_bbox(gh))]));
-   }
+     return verticesArray.map(gh => {
+       const pairs = bbox_to_pairs(decode_bbox(gh));
+       const decoded = decode(gh);
+       const latlong = [decoded.latitude, decoded.longitude];
+       return {
+         hash: gh,
+         latlong: latlong,
+         pairs: pairs,
+       }
+      })
+    }
 
    lines() {
      let res = [];
      for (let [key, value] of this.edgeMap) {
        const hashes = key.split(",");
        const points = hashes.map(gh => (decode(gh)));
-       console.log(points);
        res.push([key, points])
      }
-     console.log("lines result");
-     console.log(res);
      return res
+   }
+
+   affiliationsInGeohash(geohash) {
+     return this.affMap.get(geohash);
    }
  }
