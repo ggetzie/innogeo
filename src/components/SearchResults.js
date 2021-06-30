@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import PropTypes from "prop-types";
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
@@ -130,52 +130,90 @@ function SearchInvite(props) {
   )
 }
 
-class SearchResults extends Component {
-    
-  render() {
-    let paperHits, patentHits;
-    console.log(`searched = ${this.props.searched}`);
-    if (this.props.papers.length > 0) {
-      paperHits = this.props.papers.map((hit) => <PaperResult key={hit._id} hit={hit} />);
-    } else if (this.props.searched) {
-      paperHits = <NoResults />
-    } else {
-      paperHits = <SearchInvite />
-    }
-    
-    if (this.props.patents.length > 0) {
-      patentHits = this.props.patents.map((hit) => <PatentResult key={hit._id} hit={hit} />);
-    } else if (this.props.searched) {
-      patentHits = <NoResults />
-    } else {
-      patentHits = <SearchInvite />
-    }
-    return (
-      <Tabs defaultActiveKey="papers" transition={false} id="search-results_tabs">
-        <Tab eventKey="papers" title="Papers">
-          {paperHits}
-        </Tab>
-        <Tab eventKey="patents" title="Patents">
-          {patentHits}
-        </Tab>
-      </Tabs>
-    );
+function SearchResults() {
+  
+  const paper_graph = useSelector((state) => (state.results.papers.graph));
+  const patent_graph = useSelector((state) => (state.results.patents.graph));
+  const selectedLine = useSelector((state => (state.results.selectedLine)));
+  const searched = useSelector((state) => (state.results.searched));
+  let paperHits, patentHits;
+  console.log(`searched = ${searched}`);
+  if (paper_graph.ItemArray.length > 0) {
+    paperHits = paper_graph.ItemArray.map((hit) => <PaperResult key={hit._id} hit={hit} />);
+  } else if (searched) {
+    paperHits = <NoResults />
+  } else {
+    paperHits = <SearchInvite />
   }
-}
-
-function mapStateToProps(state) {
-  const res = {
-    papers: state.results.papers.hits,
-    patents: state.results.patents.hits,
-    searched: state.results.searched,
+  
+  if (patent_graph.ItemArray.length > 0) {
+    patentHits = patent_graph.ItemArray.map((hit) => <PatentResult key={hit._id} hit={hit} />);
+  } else if (searched) {
+    patentHits = <NoResults />
+  } else {
+    patentHits = <SearchInvite />
   }
-  return res;
+  return (
+    <Tabs defaultActiveKey="papers" transition={false} id="search-results_tabs">
+      <Tab eventKey="papers" title="Papers">
+        {paperHits}
+      </Tab>
+      <Tab eventKey="patents" title="Patents">
+        {patentHits}
+      </Tab>
+    </Tabs>
+  );
+
 }
 
-SearchResults.propTypes = {
-  papers: PropTypes.array.isRequired,
-  patents: PropTypes.array.isRequired,
-  searched: PropTypes.bool
-}
 
-export default connect(mapStateToProps)(SearchResults);
+// class SearchResults extends Component {
+    
+//   render() {
+//     let paperHits, patentHits;
+//     console.log(`searched = ${this.props.searched}`);
+//     if (this.props.papers.length > 0) {
+//       paperHits = this.props.papers.map((hit) => <PaperResult key={hit._id} hit={hit} />);
+//     } else if (this.props.searched) {
+//       paperHits = <NoResults />
+//     } else {
+//       paperHits = <SearchInvite />
+//     }
+    
+//     if (this.props.patents.length > 0) {
+//       patentHits = this.props.patents.map((hit) => <PatentResult key={hit._id} hit={hit} />);
+//     } else if (this.props.searched) {
+//       patentHits = <NoResults />
+//     } else {
+//       patentHits = <SearchInvite />
+//     }
+//     return (
+//       <Tabs defaultActiveKey="papers" transition={false} id="search-results_tabs">
+//         <Tab eventKey="papers" title="Papers">
+//           {paperHits}
+//         </Tab>
+//         <Tab eventKey="patents" title="Patents">
+//           {patentHits}
+//         </Tab>
+//       </Tabs>
+//     );
+//   }
+// }
+
+// function mapStateToProps(state) {
+//   const res = {
+//     papers: state.results.papers.hits,
+//     patents: state.results.patents.hits,
+//     searched: state.results.searched,
+//   }
+//   return res;
+// }
+
+// SearchResults.propTypes = {
+//   papers: PropTypes.array.isRequired,
+//   patents: PropTypes.array.isRequired,
+//   searched: PropTypes.bool
+// }
+
+// export default connect(mapStateToProps)(SearchResults);
+export default SearchResults

@@ -39,20 +39,21 @@ function getAffiliations(papers) {
 }
 
 function CollaborationLine(props) {
-  const [selected, setSelected] = useState(false);
+  // const [selected, setSelected] = useState(false);
   const positions = props.kv[1].map(p => [p.latitude, p.longitude]);
   const dispatch = useDispatch();
+  // get key value of currently selected line
+  const currentSelection = useSelector((state) => state.results.selectedLine);
   function clClick() {
-    setSelected(!selected);
-    // selected will still have previous value at this point
-    if (!selected) {
+      // selected will still have previous value at this point
+    if (currentSelection === props.kv[0]) {
       dispatch({
-        type: SET_SELECTED,
-        payload: props.kv[0]
+        type:CLEAR_SELECTED
       })
     } else {
       dispatch({
-        type:CLEAR_SELECTED
+        type: SET_SELECTED,
+        payload: props.kv[0]
       })
     }
   }
@@ -60,12 +61,16 @@ function CollaborationLine(props) {
   return (
     <Polyline 
     positions={positions}
-    color={selected?"yellow":"blue"}
+    color={currentSelection===props.kv[0]?"yellow":"blue"}
     onclick={clClick}
     >
       <Tooltip>{props.kv[0]}</Tooltip>
     </Polyline>
   )
+}
+
+CollaborationLine.propTypes = {
+  kv: PropTypes.object
 }
 
 const Map = React.forwardRef(( props, ref ) => {
