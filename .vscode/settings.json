@@ -25,6 +25,7 @@
     "innogeo",
     "latlong",
     "ngeohash",
-    "pairs"
+    "pairs",
+    "topright"
   ]
 }

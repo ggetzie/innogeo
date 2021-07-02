@@ -35,21 +35,31 @@ export function isDomAvailable() {
  }
 
  class AffiliationMap {
-   // keep a list of all the affiliations indexed by geohash and affiliation_id
+   // keep a list of all the affiliations or inventors indexed by geohash and affiliation_id
    constructor(searchIndex) {
      this.hashToAff = new Map();
      this.searchIndex = searchIndex;
    }
 
    add(geohash, affiliation) {
+     const key = this.affKey(affiliation);
+     let affs;
      if (this.hashToAff.has(geohash)) {
-       let affs = this.hashToAff.get(geohash);
-       affs.set(affiliation.affiliation_id, affiliation);
-       this.hashToAff.set(geohash, affs);
+       affs = this.hashToAff.get(geohash);
      } else {
-       let affs = new Map();
-       affs.set(affiliation.affiliation_id, affiliation);
-       this.hashToAff.set(geohash, affs);
+       affs = new Map();
+     }
+     affs.set(key, affiliation);
+     this.hashToAff.set(geohash, affs);
+    }
+
+   affKey(affiliation) {
+     if (this.searchIndex === "papers") {
+       return affiliation.affiliation_id;
+     } else if (this.searchIndex === "patents") {
+       return affiliation.id;
+     } else {
+       return null;
      }
    }
 
@@ -82,19 +92,31 @@ export function isDomAvailable() {
        // loop through the array of papers or patents and index them by 
        // the geohashes of their locations
        let hashArray = [];
-       for (let a of item._source.authors) {
-         if (!a.affiliation || !a.affiliation.location) { continue; }
-         const aff = a.affiliation;
-         // elasticsearch stores coordinates as [longitude, latitude]
-         const longitude = aff.location[0];
-         const latitude = aff.location[1];
-         const geohash = encode(latitude, longitude, 3); 
-         hashArray.push(geohash);
-         this.affMap.add(geohash, aff);
-       }
+       if (this.searchIndex === "papers") {
+        for (let a of item._source.authors) {
+          if (!a.affiliation || !a.affiliation.location) { continue; }
+          const aff = a.affiliation;
+          // elasticsearch stores coordinates as [longitude, latitude]
+          const longitude = aff.location[0];
+          const latitude = aff.location[1];
+          const geohash = encode(latitude, longitude, 3); 
+          hashArray.push(geohash);
+          this.affMap.add(geohash, aff);
+        }
+       } else if (this.searchIndex === "patents") {
+         for (let inventor of item._source.inventors) {
+           if (!inventor.location) { continue; }
+           const longitude = inventor.location.longitude;
+           const latitude = inventor.location.latitude;
+           const geohash = encode(latitude, longitude, 3); 
+           this.affMap.add(geohash, inventor);
+           hashArray.push(geohash)
+         }
+       } 
        for (let v of hashArray) {
          this.vertices.add(v);
        }
+       // remove duplicate hashes and combine to single string for unique key
        const hashes = [...new Set(hashArray)].sort().join(",");
        if (this.edgeMap.has(hashes)) {
          const indexList = this.edgeMap.get(hashes);
@@ -104,6 +126,10 @@ export function isDomAvailable() {
        }
        i++;
      }
+    //  console.log(`Completed EdgeMap for ${this.searchIndex}`);
+    //  for (let [k,v] of this.edgeMap) {
+    //    console.log(`${k}: ${v}`);
+    //  }
    }
 
    rects() {

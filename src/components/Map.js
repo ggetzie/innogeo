@@ -2,7 +2,8 @@ import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { 
   Map as BaseMap, TileLayer, ZoomControl, 
-  Marker, Popup, Polyline, Polygon , Tooltip
+  Marker, Popup, Polyline, Polygon , Tooltip, 
+  LayersControl, LayerGroup
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -14,54 +15,42 @@ import { SET_SELECTED, CLEAR_SELECTED } from "../actions/types"
 
 const DEFAULT_MAP_SERVICE = 'OpenStreetMap';
 
-// Hong Kong Lat Long
-// const HongKong = [22.283262, 114.160486];
-
-function getAffiliations(papers) {
-  console.log("papers in getAffiliations");
-  console.log(papers)
-  let affIdSet = new Set();
-  let affiliation_list = []
-  for (let paper of papers) {
-    for (let author of paper._source.authors) {
-        if (author.affiliation && !(affIdSet.has(author.affiliation.affiliation_id))) {
-          affiliation_list.push({
-            type: "Point",
-            coordinates: author.affiliation.location.reverse(),
-            name: author.affiliation.affiliation_name,
-            id: author.affiliation.affiliation_id
-          })
-          affIdSet.add(author.affiliation.affiliation_id)
-      }
-    }
+const COLORS = {
+  "Papers": {
+    "line": "#a829c8",
+    "contrast": "#e3d011"
+  },
+  "Patents": {
+    "line": "#ff261b",
+    "contrast":"#35f35b"
   }
-  return affiliation_list
 }
 
+// Hong Kong Lat Long
+// const HongKong = [22.283262, 114.160486];
 function CollaborationLine(props) {
   // const [selected, setSelected] = useState(false);
   const positions = props.kv[1].map(p => [p.latitude, p.longitude]);
   const dispatch = useDispatch();
   // get key value of currently selected line
-  const currentSelection = useSelector((state) => state.results.selectedLine);
+  const currentSelection = useSelector((state) => state.results[`selected${props.searchIndex}`]);
   function clClick() {
       // selected will still have previous value at this point
     if (currentSelection === props.kv[0]) {
       dispatch({
-        type:CLEAR_SELECTED
+        type:`CLEAR_SELECTED_${props.searchIndex.toUpperCase()}`
       })
     } else {
       dispatch({
-        type: SET_SELECTED,
+        type: `SET_SELECTED_${props.searchIndex.toUpperCase()}`,
         payload: props.kv[0]
       })
     }
   }
-
   return (
     <Polyline 
     positions={positions}
-    color={currentSelection===props.kv[0]?"yellow":"blue"}
+    color={currentSelection===props.kv[0]?COLORS[props.searchIndex]["contrast"]:COLORS[props.searchIndex]["line"]}
     onclick={clClick}
     >
       <Tooltip>{props.kv[0]}</Tooltip>
@@ -70,7 +59,8 @@ function CollaborationLine(props) {
 }
 
 CollaborationLine.propTypes = {
-  kv: PropTypes.object
+  kv: PropTypes.array,
+  searchIndex: PropTypes.string
 }
 
 const Map = React.forwardRef(( props, ref ) => {
@@ -82,12 +72,9 @@ const Map = React.forwardRef(( props, ref ) => {
   const mapRef = ref || backupRef;
 
   // locate papers on the map
-  // const papers = useSelector((state) => state.results.papers.hits)
   const paper_graph = useSelector((state) => state.results.papers.graph);
-
-  const vertices = paper_graph.rects();
-  
-  const rects = vertices.map(bb => (
+  const paperVertices = paper_graph.rects();
+  const paperRects = paperVertices.map(bb => (
     <React.Fragment key={`f_${bb.hash}`}>
       <Polygon color="magenta" key={bb.hash} positions={bb.pairs} />
       <Marker key={`m_${bb.hash}`} position={bb.latlong} >
@@ -104,26 +91,33 @@ const Map = React.forwardRef(( props, ref ) => {
       </Marker>
     </React.Fragment>
   ));
-
-  // const lines = paper_graph.lines().map(kv => (
-  //   <Polyline 
-  //   color={this.props.selected?"yellow":"blue"} 
-  //   key={kv[0]} 
-  //   selected={false}
-  //   positions={kv[1].map(p => [p.latitude, p.longitude])} 
-  //   onclick={(e) => (console.log(e.target))}
-  //   />
-  // ));
-  console.log("paper_graph edgeMap")
-  for (let [key, value] of paper_graph.edgeMap) {
-    console.log(`${key}: ${value}`)
-  }
-
-    const lines = paper_graph.lines().map(kv => (
-    <CollaborationLine key={kv[0]} kv={kv} />
+  const paperLines = paper_graph.lines().map(kv => (
+    <CollaborationLine key={kv[0]} kv={kv} searchIndex="Papers" />
   ));
 
-  // const affiliations = getAffiliations(papers)
+  // locate patents on the map
+  const patent_graph = useSelector((state) => state.results.patents.graph);
+  const patentVertices = patent_graph.rects();
+  const patentRects = patentVertices.map(bb => (
+    <React.Fragment key={`f_${bb.hash}`}>
+      <Polygon color="red" key={bb.hash} positions={bb.pairs} />
+      <Marker key={`m_${bb.hash}`} position={bb.latlong} >
+        <Popup>
+          <h3>Inventors in this Area</h3>
+          <ul>
+            {
+              patent_graph.affiliationsInGeohash(bb.hash).map(inventor => (
+                <li key={inventor.id}>{inventor.name}</li>
+              ))
+            }
+          </ul>
+        </Popup>
+      </Marker>
+    </React.Fragment>
+  ));
+  const patentLines = patent_graph.lines().map(kv => (
+    <CollaborationLine key={kv[0]} kv={kv} searchIndex="Patents" />
+  ))
 
   const services = useMapServices({
     names: [...new Set([defaultBaseMap, DEFAULT_MAP_SERVICE])],
@@ -149,42 +143,25 @@ const Map = React.forwardRef(( props, ref ) => {
     zoomControl: false,
     ...rest,
   };
-  // const affiliationMarkers = affiliations.map((aff) => (
-  //   <Marker key={aff.id} position={aff.coordinates}>
-  //     <Popup>
-  //       {aff.name} - [{aff.coordinates[0]}, {aff.coordinates[1]}]
-  //     </Popup>
-  //   </Marker>
-  // ))
-
-  // const collaborationLines = papers
-  // .filter((paper) => (paper._source.locations.length > 1))
-  // .map((paper) => (
-  //   <Polyline 
-  //   key={paper._source.paper_id} 
-  //   positions={paper._source.locations.map((l) => l.reverse())}
-  //   color="magenta">
-  //   </Polyline>
-  // ))
-
-  // const polygons = paper_buckets.map((bucket) => {
-  //   let positions = bbox_to_pairs(decode_bbox(bucket.key));
-  //   return (
-  //     <Polygon positions={positions} color="red">
-  //       <Popup>
-  //         {bucket.doc_count} papers in this area
-  //       </Popup>
-  //     </Polygon>
-  //   )
-  // });
 
   return (
     <div className={mapClassName}>
       <BaseMap ref={mapRef} {...mapSettings}>
-        {/* {affiliationMarkers} */}
-        {/* {collaborationLines} */}
-        {rects}
-        {lines}
+        <LayersControl position="topright">
+          <LayersControl.Overlay checked name="Papers">
+            <LayerGroup>
+              {paperRects}
+              {paperLines}
+            </LayerGroup>
+          </LayersControl.Overlay>
+          <LayersControl.Overlay name="Patents">
+            <LayerGroup>
+              {patentRects}
+              {patentLines}
+            </LayerGroup>
+          </LayersControl.Overlay>
+        </LayersControl>
+        
         { children }
         { basemap && <TileLayer {...basemap} /> }
         <ZoomControl position="bottomright" />

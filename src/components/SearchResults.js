@@ -72,7 +72,7 @@ function InventorItem(props) {
   }
 
   return (
-    <li key={props.inventor.id}>
+    <li>
       {content}
     </li>
   )
@@ -90,7 +90,7 @@ function CPCGroupItem(props) {
 }
 
 function PatentResult(props) {
-  const inventors = props.hit._source.inventors.map((inventor) => (<InventorItem inventor={inventor}/>));
+  const inventors = props.hit._source.inventors.map((inventor) => (<InventorItem key={inventor.id} inventor={inventor}/>));
   const cpc_groups = props.hit._source.cpc.groups.map((group, index) => (<CPCGroupItem key={index} group={group} />));
   return (
     <div key={props.hit._source.id} className="search-result">
@@ -134,20 +134,38 @@ function SearchResults() {
   
   const paper_graph = useSelector((state) => (state.results.papers.graph));
   const patent_graph = useSelector((state) => (state.results.patents.graph));
-  const selectedLine = useSelector((state => (state.results.selectedLine)));
+  const selectedPapers = useSelector((state) => (state.results.selectedPapers));
+  const selectedPatents = useSelector((state) => (state.results.selectedPatents));
   const searched = useSelector((state) => (state.results.searched));
+
+  let showPapers;
+  if (selectedPapers !== null) {
+    const indices = paper_graph.edgeMap.get(selectedPapers);
+    showPapers = indices.map(i => paper_graph.itemArray[i]);
+  } else {
+    showPapers = paper_graph.itemArray
+  }
+
+  let showPatents;
+  if (selectedPatents !== null) {
+    const indices = patent_graph.edgeMap.get(selectedPatents);
+    showPatents = indices.map(i => patent_graph.itemArray[i]);
+  } else {
+    showPatents = patent_graph.itemArray;
+  }
+
   let paperHits, patentHits;
   console.log(`searched = ${searched}`);
-  if (paper_graph.ItemArray.length > 0) {
-    paperHits = paper_graph.ItemArray.map((hit) => <PaperResult key={hit._id} hit={hit} />);
+  if (showPapers.length > 0) {
+    paperHits = showPapers.map((hit) => <PaperResult key={hit._id} hit={hit} />);
   } else if (searched) {
     paperHits = <NoResults />
   } else {
     paperHits = <SearchInvite />
   }
   
-  if (patent_graph.ItemArray.length > 0) {
-    patentHits = patent_graph.ItemArray.map((hit) => <PatentResult key={hit._id} hit={hit} />);
+  if (showPatents.length > 0) {
+    patentHits = showPatents.map((hit) => <PatentResult key={hit._id} hit={hit} />);
   } else if (searched) {
     patentHits = <NoResults />
   } else {
@@ -166,54 +184,4 @@ function SearchResults() {
 
 }
 
-
-// class SearchResults extends Component {
-    
-//   render() {
-//     let paperHits, patentHits;
-//     console.log(`searched = ${this.props.searched}`);
-//     if (this.props.papers.length > 0) {
-//       paperHits = this.props.papers.map((hit) => <PaperResult key={hit._id} hit={hit} />);
-//     } else if (this.props.searched) {
-//       paperHits = <NoResults />
-//     } else {
-//       paperHits = <SearchInvite />
-//     }
-    
-//     if (this.props.patents.length > 0) {
-//       patentHits = this.props.patents.map((hit) => <PatentResult key={hit._id} hit={hit} />);
-//     } else if (this.props.searched) {
-//       patentHits = <NoResults />
-//     } else {
-//       patentHits = <SearchInvite />
-//     }
-//     return (
-//       <Tabs defaultActiveKey="papers" transition={false} id="search-results_tabs">
-//         <Tab eventKey="papers" title="Papers">
-//           {paperHits}
-//         </Tab>
-//         <Tab eventKey="patents" title="Patents">
-//           {patentHits}
-//         </Tab>
-//       </Tabs>
-//     );
-//   }
-// }
-
-// function mapStateToProps(state) {
-//   const res = {
-//     papers: state.results.papers.hits,
-//     patents: state.results.patents.hits,
-//     searched: state.results.searched,
-//   }
-//   return res;
-// }
-
-// SearchResults.propTypes = {
-//   papers: PropTypes.array.isRequired,
-//   patents: PropTypes.array.isRequired,
-//   searched: PropTypes.bool
-// }
-
-// export default connect(mapStateToProps)(SearchResults);
 export default SearchResults
