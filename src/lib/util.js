@@ -12,6 +12,8 @@ export function isDomAvailable() {
 
  export const ES_URL = 'https://1z85a4how2.execute-api.us-east-1.amazonaws.com/search_es'
 
+ const HK_GEOHASH = "wec";
+
 
  export function bbox_to_pairs(arr) {
    // arr = [minLat, minLong, maxLat, maxLong]
@@ -80,6 +82,7 @@ export function isDomAvailable() {
      this.itemArray = itemArray;
      this.edgeMap = new Map();
      this.vertices = new Set();
+     this.inHK = 0;
 
      if (itemArray.length > 0) {
        this.searchIndex = itemArray[0]._index;
@@ -103,6 +106,9 @@ export function isDomAvailable() {
           const longitude = aff.location[0];
           const latitude = aff.location[1];
           const geohash = encode(latitude, longitude, 3); 
+          if (geohash === HK_GEOHASH) {
+            this.inHK++;
+          }
           hashArray.push(geohash);
           this.affMap.add(geohash, aff);
         }
@@ -112,6 +118,9 @@ export function isDomAvailable() {
            const longitude = inventor.location.longitude;
            const latitude = inventor.location.latitude;
            const geohash = encode(latitude, longitude, 3); 
+           if (geohash === HK_GEOHASH) {
+            this.inHK++; 
+           }
            this.affMap.add(geohash, inventor);
            hashArray.push(geohash)
          }

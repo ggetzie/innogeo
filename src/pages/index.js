@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 
 import Layout from 'components/Layout';
 import Map from 'components/Map';
+import Stats from 'components/Stats';
 import SearchForm from 'components/SearchForm';
 import SearchResults from 'components/SearchResults';
 import { Provider } from 'react-redux';
@@ -51,7 +52,7 @@ const IndexPage = () => {
             <Map ref={mapRef} {...mapSettings}>
             </Map>
             <div className="stats">
-              Stats go here
+              <Stats />
             </div>
           </div>
           

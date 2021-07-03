@@ -100,7 +100,9 @@ const Map = React.forwardRef(( props, ref ) => {
   const patentVertices = patent_graph.rects();
   const patentRects = patentVertices.map(bb => (
     <React.Fragment key={`f_${bb.hash}`}>
-      <Polygon color={COLORS.Patents.contrast} key={bb.hash} positions={bb.pairs} />
+      <Polygon color={COLORS.Patents.contrast} key={bb.hash} positions={bb.pairs}>
+        <Tooltip>{bb.hash}</Tooltip>
+      </Polygon>
       <Marker key={`m_${bb.hash}`} position={bb.latlong} >
         <Popup>
           <h3>Inventors in this Area</h3>

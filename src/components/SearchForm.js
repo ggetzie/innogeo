@@ -419,7 +419,7 @@ class SearchForm extends Component {
       <div className="search-form">
         <h2 className="mt-2">Search</h2>
         <p>
-          Use the form below to search over 70M scholarly papers and display collaboration relationships on the map.
+          Use the form below to search over 70M scholarly papers and 7M US patents and display collaboration relationships on the map.
         </p>
           {content}
       </div>
