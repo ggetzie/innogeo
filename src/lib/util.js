@@ -43,14 +43,16 @@ export function isDomAvailable() {
 
    add(geohash, affiliation) {
      const key = this.affKey(affiliation);
-     let affs;
      if (this.hashToAff.has(geohash)) {
-       affs = this.hashToAff.get(geohash);
+       console.log(`adding to existing geohash ${geohash}`);
+       let affs = this.hashToAff.get(geohash);
+       affs.set(key, affiliation);
+       this.hashToAff.set(geohash, affs)
      } else {
-       affs = new Map();
+       let m = new Map();
+       m.set(key, affiliation);
+       this.hashToAff.set(geohash, m);
      }
-     affs.set(key, affiliation);
-     this.hashToAff.set(geohash, affs);
     }
 
    affKey(affiliation) {
@@ -78,12 +80,13 @@ export function isDomAvailable() {
      this.itemArray = itemArray;
      this.edgeMap = new Map();
      this.vertices = new Set();
-     this.affMap = new AffiliationMap(); // {geohash: {affiliation_id: {affiliation}}
+
      if (itemArray.length > 0) {
        this.searchIndex = itemArray[0]._index;
      } else {
        this.searchIndex = null;
      }
+     this.affMap = new AffiliationMap(this.searchIndex); // {geohash: {affiliation_id: {affiliation}}
      
      let i = 0;
      console.log("creating graph from items");

@@ -76,7 +76,7 @@ const Map = React.forwardRef(( props, ref ) => {
   const paperVertices = paper_graph.rects();
   const paperRects = paperVertices.map(bb => (
     <React.Fragment key={`f_${bb.hash}`}>
-      <Polygon color="magenta" key={bb.hash} positions={bb.pairs} />
+      <Polygon color={COLORS.Papers.contrast} key={bb.hash} positions={bb.pairs} />
       <Marker key={`m_${bb.hash}`} position={bb.latlong} >
         <Popup>
           <h3>Affiliations in this Area</h3>
@@ -100,7 +100,7 @@ const Map = React.forwardRef(( props, ref ) => {
   const patentVertices = patent_graph.rects();
   const patentRects = patentVertices.map(bb => (
     <React.Fragment key={`f_${bb.hash}`}>
-      <Polygon color="red" key={bb.hash} positions={bb.pairs} />
+      <Polygon color={COLORS.Patents.contrast} key={bb.hash} positions={bb.pairs} />
       <Marker key={`m_${bb.hash}`} position={bb.latlong} >
         <Popup>
           <h3>Inventors in this Area</h3>
